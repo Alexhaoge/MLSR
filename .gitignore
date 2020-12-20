@@ -1,3 +1,6 @@
+# data with privacy issues
+/data/
+
 # Byte-compiled / optimized / DLL files
 .idea/
 __pycache__/
