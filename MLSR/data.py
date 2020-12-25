@@ -54,34 +54,30 @@ class DataSet:
         return self.weak_data, self.strong_data
 
     @staticmethod
-    def do_nation_policy(d: pd.DataFrame,
-                         drop: bool = True,
+    def do_nation_policy(data: pd.DataFrame,
                          is_income_contained: bool = True,
-                         is_emergency_contained: bool = True
+                         is_accident_contained: bool = True
                          ) -> pd.DataFrame:
         """
         处理“享受国家政策资助情况”一列
         Args:
-            d:
-            drop:
+            data:
             is_income_contained:
-            is_emergency_contained:
+            is_accident_contained:
 
         Returns:
 
         """
-        d = pd.DataFrame(d)
-        d["建档立卡贫困户"] = d["享受国家政策资助情况"].str.contains("立卡", na=False)
-        d["城乡低保户"] = d["享受国家政策资助情况"].str.contains("低保", na=False)
+        d = pd.DataFrame()
+        d["建档立卡贫困户"] = data["享受国家政策资助情况"].str.contains("立卡", na=False)
+        d["城乡低保户"] = data["享受国家政策资助情况"].str.contains("低保", na=False)
         if is_income_contained:
-            d['城乡低保户'] |= d['家庭主要经济来源'].str.contains('低保|最低生活保障', na=False)
-        d["五保户"] = d["享受国家政策资助情况"].str.contains("五保", na=False)
-        d["孤残学生"] = d["享受国家政策资助情况"].str.contains("孤残", na=False)
-        if is_emergency_contained:
-            d['孤残学生'] |= d["突发事件情况"].str.contains("父母双亡|父母去世|孤残|孤儿|重大疾病、突发意外致残|本人视力残疾|本人严重烫伤", na=False)
-        d["军烈属或优抚子女"] = d["享受国家政策资助情况"].str.contains("军烈属", na=False)
-        if drop:
-            d.drop('享受国家政策资助情况', inplace=True)
+            d['城乡低保户'] |= data['家庭主要经济来源'].str.contains('低保|最低生活保障', na=False)
+        d["五保户"] = data["享受国家政策资助情况"].str.contains("五保", na=False)
+        d["孤残学生"] = data["享受国家政策资助情况"].str.contains("孤残", na=False)
+        if is_accident_contained:
+            d['孤残学生'] |= data["突发事件情况"].str.contains("父母双亡|父母去世|孤残|孤儿|重大疾病、突发意外致残|本人视力残疾|本人严重烫伤", na=False)
+        d["军烈属或优抚子女"] = data["享受国家政策资助情况"].str.contains("军烈属", na=False)
         return d
 
     @staticmethod
@@ -154,7 +150,7 @@ class DataSet:
         return d
 
     @staticmethod
-    def education(s: pd.Series) -> pd.DataFrame:
+    def do_education(s: pd.Series) -> pd.DataFrame:
         """
 
         Args:
@@ -444,3 +440,354 @@ class DataSet:
 
             df.iloc[row] = [u_num, h_num, c_num]
         return df
+
+    @staticmethod
+    def do_accident(s: pd.Series):
+        # 突发事件情况
+        s = s.fillna('无')
+        zero_tmp1 = ['无', '否', '没有', '正常', '暂无']
+        s = s.apply(lambda x: '无' if x in zero_tmp1 else x)
+
+        # 创建关键字
+        dad = {"爸爸", "父亲", "爸", "父"}
+        mom = {"妈妈", "母亲", "妈", "母"}
+        grand_parents = {"老人", "长辈", "祖父母", "爷爷", "奶奶", "外祖父", "外祖母",
+                         "姥爷", "姥姥", "外公", "外婆"}
+        sp_grand_parents = {"爷", "奶", "祖父", "祖母"}
+        siblings = {"哥哥", "姐姐", "弟弟", "妹妹"}
+        sp_siblings = {"哥", "兄", "姐", "弟", "妹", "大哥", "二哥", "大弟",
+                       "二弟", "三弟", "四弟", "五弟", "小弟", "大姐", "长姐",
+                       "二姐", "三姐", "大妹", "小妹", "二妹", "三妹", "四妹"}
+        invalid_member = {"我", "本人", "自己", "侄女", "侄子", "伯伯", "伯母",
+                          "大伯", "二伯", "三伯", "伯父", "婆婆", "舅舅", "小姑",
+                          "姑姑", "二姑", "大舅", "叔叔", "叔父", "二叔", "老叔", "舅妈"}
+        divorce = {"单亲", "离婚", "离异"}
+        unemployed = {"无业", "一方无业", "均无业", "失业", "无法工作", "下岗",
+                      "公司破产", "无工作", "待业", "倒闭", "离职", "未有收入",
+                      "无收入", "停产", "失去稳定工作", "没能工作"}
+        dead = {"去世", "离世", "病逝", "死亡", "治丧", "身亡", "病故"}
+        illness = {
+            "病", "病了", "就医", "发病", "有病", "多病", "车祸", "住院", "养病", "疾病",
+            "病情", "受伤", "顽疾", "服药", "腰伤", "慢性疾病", "普通疾病", "一般疾病",
+            "生病", "患病", "带病", "患疾", "皮肤病", "高血压", "高血糖", "高血脂",
+            "风湿", "类风湿", "风湿病", "心脏病", "糖尿病", "高血脂", "三高", "囊肿",
+            "肝囊肿", "结石", "肾结石", "胆结石", "结石病", "尿结石", "肾囊肿",
+            "肾积水", "脑溢血", "脑血栓", "心脑血管疾病", "心脑疾病", "青光眼", "慢阻肺",
+            "中风", "白内障", "肺结核", "冠心病", "甲亢", "癫痫", "股骨头坏死",
+            "风湿", "腿脚不便", "精神病", "精神疾病", "精神分裂症", "精神性疾病", "气胸",
+            "胃穿孔", "骨折", "骨裂", "红斑狼疮", "腰椎间盘突出", "腰间盘突出", "关节炎",
+            "骨质增生", "胃溃疡", "手术", "腿疾", "胃病", "感染", "胰腺炎", "溃烂",
+            "摔伤", "腿伤", "睡眠障碍", "工伤", "视网膜", "白癜风", "关节病", "颈椎病",
+            "胆囊炎", "坠楼", "瘸", "贫血", "脱髓鞘", "事故", "意外事故", "服药", "体弱",
+            "卷入机器", "气管炎", "支气管炎", "卧病", "交通事故", "吃药", "胃出血",
+            "脑出血", "颅内出血", "子宫肌瘤", "腰椎", "颈椎", "腰椎病", "后遗症",
+            "割伤", "脑垂体瘤", "脊椎炎", "扎伤", "烫伤", "肺气肿", "卧床", "断裂",
+            "眼疾", "伤手", "摔了", "吃药", "旧病复发", "切断", "摔到", "意外事故"}
+        serious_illness = {
+            "大病", "病重", "重病", "重疾", "重大疾病", "肌无力", "肿瘤", "瘤", "白血病",
+            "癌", "患癌", "癌症", "肝癌", "食道癌", "卵巢癌", "甲状腺癌", "肺癌", "宫颈癌",
+            "脑癌", "直肠癌", "乳腺癌", "胃癌", "肺腺癌", "贲门癌", "喷门癌", "食道癌",
+            "肠癌", "乳癌", "结肠癌", "前列腺癌", "致癌", "肾癌", "淋巴癌", "食道癌",
+            "心梗", "心肌梗塞", "脑中风", "移植", "搭桥", "支架", "肾炎", "肾病综合征",
+            "肾综合", "严重肾病", "肾衰竭", "尿毒症", "截肢", "肝病", "肝硬化", "肝炎",
+            "干重活", "做重活", "不能工作", "失去劳动力", "丧失劳动力", "丧失行动力",
+            "无法劳作", "丧失劳动能力", "失去部分劳动力", "失去全部劳动力", "无法承受过重劳动",
+            "失去行动能力", "干不了", "干重活", "不能劳作", "不得剧烈运动", "脑梗", "脑梗塞",
+            "脑梗死", "脑膜炎", "脑膜瘤", "昏迷", "聋", "失聪", "耳聋", "聋哑人", "聋哑",
+            "失明", "瘫痪", "偏瘫", "脑瘫", "截瘫", "致瘫", "帕金森", "瓣膜病", "痴呆",
+            "老年痴呆", "老年痴呆症", "烧伤", "火烧", "语言", "贫血", "主动脉", "残疾",
+            "残废", "伤残", "摔断", "砸断", "神志不清", "骨髓瘤", "致残", "脑萎缩", "脑血管",
+            "脑结核", "半身不遂", "致盲", "病危", "再生性贫血障碍", "生活无法自理", "做手术"
+        }
+
+        suggetst_word = [
+            '严重肾病', '肾病综合征', '失去劳动力', '丧失劳动力', '丧失行动力',
+            '无法劳作', '不能劳作', '失去部分劳动力', '失去部分劳动力', '失去行动能力',
+            '丧失劳动能力', '无法承受过重劳动', '心脑血管疾病', '心脑疾病', '肺腺癌',
+            '脑梗', '不得剧烈运动', '重大疾病', '普通疾病', '一般疾病', '一方无业',
+            '均无业', '股骨头坏死', '干重活', '做重活', '腿脚不便', '无法工作', '工作',
+            '精神性疾病', '精神官能症', '公司破产', '腰椎间盘突出', '腰间盘突出', '腿疾',
+            '无工作', '慢性疾病', '睡眠障碍', '卷入机器', '颅内出血', '子宫肌瘤',
+            '未有收入', '脑垂体瘤', '病了', '再生性贫血障碍', '摔了', '生活无法自理',
+            '失去稳定工作', '没能工作', '旧病复发', '摔到'
+        ]
+        for _word in suggetst_word:
+            suggest_freq(tuple(_word), True)
+        suggest_split = [
+            ('癫痫', '病'), ('卧床', '不起'), ('黑色素', '瘤'), ('单亲', '家庭'), ('恶性', '肿瘤'),
+            ('断', '腿'), ('断', '手'), ('家', '父'), ('家', '母')
+        ]
+        for _split in suggest_split:
+            suggest_freq(_split, True)
+
+        # 对每个字符串进行分词，并且找寻其中关键字，记录关键字的词性和位置
+        arr = zeros(shape=(len(s), 11))
+        df = pd.DataFrame(arr, columns=[
+            "祖父母患病", "父母离异", "父亲（母亲）患普通疾病", "父母患普通疾病", "父亲（母亲）无业", "父母均无业", "兄弟姐妹患重疾",
+            "父亲（母亲）患重疾", "父母患重疾", "父亲（母亲）去世", "突发重大自然灾害"
+        ])
+        index = s.str.contains(
+            "灾|病虫害|霜冻|地震|台风|洪水|大水|大旱|干旱|冰雹|暴风雨|暴雨|下雪|雷劈|" +
+            "禽流感|高温|减产|倒伏|淹|涝|庄稼大量死亡|自然状况|自然天气状况|减产|泥石流|猪瘟|庄稼无收")
+        adjusted_index = 0  # 由于index中少了一些索引，无法直接匹配到df中，需要调整index
+        for i in index:
+            if i:
+                df.loc[adjusted_index, "突发重大自然灾害"] = 1
+            adjusted_index += 1
+
+        row = -1  # 记录str在s中的位置
+
+        for _str in s:
+            row += 1
+            seg_list = cut(_str, cut_all=False)  # 对每个字符串进行分词
+            output = list(seg_list)
+            cut_type = []  # 记录某个关键字的词性
+            cut_loc = []  # 记录某个关键字在str中的位置
+            loc = 0  # loc为某个词在原字符串中的位置(1~len)
+
+            for _cut in output:  # cut为分词结果中的每个词
+                loc += 1
+                if _cut in dad:
+                    cut_type.append("dad")
+                    cut_loc.append(loc - 1)  # cut在原字符串中的索引值(0~len-1)
+
+                elif _cut in mom:
+                    cut_type.append("mom")
+                    cut_loc.append(loc - 1)
+
+                elif _cut in grand_parents:
+                    cut_type.append("grand_parents")
+                    cut_loc.append(loc - 1)
+
+                elif _cut in sp_grand_parents:
+                    cut_type.append("sp_grand_parents")
+                    cut_loc.append(loc - 1)
+
+                elif _cut in siblings:
+                    cut_type.append("siblings")
+                    cut_loc.append(loc - 1)
+
+                elif _cut in sp_siblings:
+                    cut_type.append("sp_siblings")
+                    cut_loc.append(loc - 1)
+
+                elif _cut in invalid_member:
+                    cut_type.append("invalid_member")
+                    cut_loc.append(loc - 1)
+
+                elif _cut in divorce:
+                    cut_type.append("divorce")
+                    cut_loc.append(loc - 1)
+
+                elif _cut in unemployed:
+                    cut_type.append("unemployed")
+                    cut_loc.append(loc - 1)
+
+                elif _cut in dead:
+                    cut_type.append("dead")
+                    cut_loc.append(loc - 1)
+
+                elif _cut in illness:
+                    cut_type.append("illness")
+                    cut_loc.append(loc - 1)
+
+                elif _cut in serious_illness:
+                    cut_type.append("serious_illness")
+                    cut_loc.append(loc - 1)
+
+            #             print(str)
+            #             print(output)
+            #             print(cut_type)
+            #             print(cut_loc)
+
+            #         在cut_type中找寻如下pattern，并总结出每个人发生什么事情：
+            #         每一个人可能同时做多件事情，而这多件事情肯定是按顺序排列的，这些事情之间一定不出现另一个人名
+            #         无论在哪里出现divorce，一定为父母离异，但是如果出现在“父母”之后，则需要把这个“父母”与divorce绑定
+            #         这里jieba无法将“父母”、“父/母”、“父(母)”、“父亲（母亲）”分开，所以需要加一个判断条件，会用在后面无业、患病、去世中
+            #         一个人之后可能跟着多个illness，应全部与其绑定。若人是祖父母，则统计其是否患病；父母则看是否有重病，且应将父母辨别开；兄弟姐妹只统计重疾。
+            #         有可能出现人 -> illness ->dead。所有人都有可能dead，dead需要与之前最近的一个人或连续的多个人绑定，但只统计父或母去世。
+
+            serial = 0
+            cut_type.append(" ")
+            cut_type.append(" ")  # 确保检测到最后一位也能检测其后两位的元素的词性
+            cut_loc.append(" ")
+            cut_loc.append(" ")
+
+            while serial < len(cut_type) - 2:
+                flag_dad = False
+                flag_mom = False
+                flag_parents = False  # 判断是父或母还是父与母
+                flag_grand_parents = False
+                flag_sp_grand_parents = False
+                flag_siblings = False
+                flag_sp_siblings = False
+                flag_divorce = False
+                flag_unemployed = False
+                flag_dead = False
+                flag_illness = False
+                flag_serious_illness = False  # 用来检测每组中是否出现相应的关键词，若有则按照规则赋予相应的类1
+
+                current_group = []
+                current_loc = []
+
+                # 每一个pattern起始的词只能为家庭成员
+                if (cut_type[serial] in [
+                    "dad", "mom", "grand_parents", "sp_grand_parents",
+                    "siblings", "sp_siblings", "invalid_member"]):
+                    current_group.append(cut_type[serial])
+                    current_loc.append(cut_loc[serial])  # 用来判断父母是否连着
+
+                    for forward in range(serial + 1, len(cut_type) - 1):  # 开始检测该pattern内后面的词
+                        current_group.append(cut_type[forward])
+                        current_loc.append(cut_loc[forward])
+                        if ((cut_type[forward] in [" ", "divorce", "unemployed", "dead", "illness",
+                                                   "serious_illness"]) and (
+                                cut_type[forward + 1] in [" ", "dad", "mom", "grand_parents", "sp_grand_parents",
+                                                          "siblings", "sp_siblings", "invalid_member"])):
+                            serial = forward + 1  # 找到行为 -> 人，这一组完成，定位至下一组首个词
+                            break
+
+                    # 此时一组已经检测完成，对其进行匹配
+                    group_serial = 0
+                    current_group.append(" ")
+                    current_group.append(" ")  # 确保检测到最后一位也能检测其后两位的元素
+                    current_loc.append(" ")
+                    current_loc.append(" ")
+                    current_loc.append(" ")
+                    current_loc.append(" ")
+
+                    while group_serial < len(current_group) - 2:
+                        # 一个或多个家庭成员 -> 一件或多件事情 -> 非事情
+                        if (current_group[group_serial] in ["dad", "mom", "grand_parents", "sp_grand_parents",
+                                                            "siblings", "sp_siblings", "invalid_member", "divorce",
+                                                            "unemployed", "dead", "illness", "serious_illness"]):
+                            if (current_group[group_serial + 1] not in [" ", "dad", "mom", "grand_parents",
+                                                                        "sp_grand_parents", "siblings",
+                                                                        "sp_siblings", "invalid_member", "divorce",
+                                                                        "unemployed", "dead", "illness",
+                                                                        "serious_illness"]):
+                                break
+
+                            if current_group[group_serial] == "dad":
+                                flag_dad = True
+                                if ((current_group[group_serial + 1] == "mom") and (
+                                        current_loc[group_serial + 1] == current_loc[group_serial] + 1)):
+                                    flag_parents = True
+
+                            elif current_group[group_serial] == "mom":
+                                flag_mom = True
+                                if ((current_group[group_serial + 1] == "dad") and (
+                                        current_loc[group_serial + 1] == current_loc[group_serial] + 1)):
+                                    flag_parents = True
+
+                            elif current_group[group_serial] == "grand_parents":
+                                flag_grand_parents = True
+
+                            elif current_group[group_serial] == "sp_grand_parents":
+                                flag_sp_grand_parents = True
+
+                            elif current_group[group_serial] == "siblings":
+                                flag_siblings = True
+
+                            elif current_group[group_serial] == "sp_siblings":
+                                flag_sp_siblings = True
+
+                            elif current_group[group_serial] == "divorce":
+                                flag_divorce = True
+
+                            elif current_group[group_serial] == "unemployed":
+                                flag_unemployed = True
+
+                            elif current_group[group_serial] == "dead":
+                                flag_dead = True
+
+                            elif current_group[group_serial] == "illness":
+                                flag_illness = True
+
+                            elif current_group[group_serial] == "serious_illness":
+                                flag_serious_illness = True
+
+                            # 一个pattern中的词已经全部找到，对该pattern进行考察
+                            if ((flag_grand_parents or flag_sp_grand_parents) and (
+                                        flag_illness or flag_serious_illness)):
+                                df.loc[row, "祖父母患病"] = 1
+
+                            if flag_divorce:
+                                df.loc[row, "父母离异"] = 1
+
+                            if flag_illness and (flag_dad or flag_mom) and not flag_parents:
+                                df.loc[row, "父亲（母亲）患普通疾病"] = 1
+
+                            if flag_illness and flag_dad and flag_mom and flag_parents:
+                                df.loc[row, "父母患普通疾病"] = 1
+
+                            if flag_unemployed and (flag_dad or flag_mom) and not flag_parents:
+                                df.loc[row, "父亲（母亲）无业"] = 1
+
+                            if flag_unemployed and flag_dad and flag_mom and flag_parents:
+                                df.loc[row, "父母均无业"] = 1
+
+                            if flag_serious_illness and (flag_siblings or flag_sp_siblings):
+                                df.loc[row, "兄弟姐妹患重疾"] = 1
+
+                            if flag_serious_illness and (flag_dad or flag_mom) and not flag_parents:
+                                df.loc[row, "父亲（母亲）患重疾"] = 1
+
+                            if flag_serious_illness and flag_dad and flag_mom and flag_parents:
+                                df.loc[row, "父母患重疾"] = 1
+
+                            if flag_dead and (flag_dad or flag_mom) and not flag_parents:
+                                df.loc[row, "父亲（母亲）去世"] = 1
+
+                        group_serial += 1
+
+                else:  # 该词不为个数或家庭成员，则访问下一个
+                    serial += 1
+        return df
+
+    @staticmethod
+    def do_scholarship(data: pd.Series) -> pd.DataFrame:
+        d = pd.DataFrame()
+        d["在校受奖励资助情况"] = data["在校受奖励资助情况"].fillna('无')
+
+        d['圆梦启航'] = d["在校受奖励资助情况"].str.contains("圆梦启航")
+        d["慧明"] = d["在校受奖励资助情况"].str.contains("慧明")
+        d['欧莱雅'] = d["在校受奖励资助情况"].str.contains('欧莱雅')
+        d['喜来健'] = d["在校受奖励资助情况"].str.contains("喜来健")
+        d['中海油'] = d["在校受奖励资助情况"].str.contains("中海油")
+        d['承锋'] = d["在校受奖励资助情况"].str.contains("承锋")
+        d['宋声扬'] = data["在校受奖励资助情况"].str.contains("宋声扬")
+        d['国泰'] = data["在校受奖励资助情况"].str.contains("国泰")
+        d['思源'] = data["在校受奖励资助情况"].str.contains("思源")
+        d['清茗雅轩'] = data["在校受奖励资助情况"].str.contains("清茗雅轩")
+        d['盛帆'] = data["在校受奖励资助情况"].str.contains("盛帆")
+        d['长城'] = data["在校受奖励资助情况"].str.contains("长城")
+        d['电装'] = data["在校受奖励资助情况"].str.contains("电装")
+        d['交通'] = data["在校受奖励资助情况"].str.contains("交通")
+        d['福慧'] = data["在校受奖励资助情况"].str.contains("福慧")
+
+        index = data["在校受奖励资助情况"].str.contains("柏年")
+        data.loc[index, "柏年"] = 1
+        data.loc[-index, "柏年"] = 0
+
+        index = data["在校受奖励资助情况"].str.contains("圣恩纳")
+        data.loc[index, "圣恩纳"] = 1
+        data.loc[-index, "圣恩纳"] = 0
+
+        index = data["在校受奖励资助情况"].str.contains("香港好友")
+        data.loc[index, "香港好友"] = 1
+        data.loc[-index, "香港好友"] = 0
+
+        index = data["在校受奖励资助情况"].str.contains("冯顾丽华")
+        data.loc[index, "冯顾丽华"] = 1
+        data.loc[-index, "冯顾丽华"] = 0
+
+        index = ((data["在校受奖励资助情况"].str.contains("国家")) | (data["在校受奖励资助情况"].str.contains("国助"))) & (
+            data["在校受奖励资助情况"].str.contains("一"))
+        data.loc[index, "国家一等助学金"] = 1
+        data.loc[-index, "国家一等助学金"] = 0
+
+        index = ((data["在校受奖励资助情况"].str.contains("国家")) | (data["在校受奖励资助情况"].str.contains("国助"))) & (
+            ~ (data["在校受奖励资助情况"].str.contains("一")))
+        data.loc[index, "国家二等助学金"] = 1
+        data.loc[-index, "国家二等助学金"] = 0
