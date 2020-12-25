@@ -3,9 +3,6 @@ from numpy import random, zeros
 from jieba import suggest_freq, cut
 
 
-# import re
-
-
 class DataSet:
     """
     Class for data set manipulation
@@ -34,8 +31,8 @@ class DataSet:
 
         """
         data = data[data.columns[:16]]
-        data.drop(labels=[1772, 8297], inplace=True)
-        data.drop(['院系', '专业', '出生年月', '所在校区'], axis=1, inplace=True)
+        data.drop(labels=[1772, 8297], inplace=True, errors='ignore')
+        data.drop(['院系', '专业', '出生年月', '所在校区'], axis=1, inplace=True, errors='ignore')
         return data
 
     def shuffle_and_pick(self, out_path: str = 'rand_select') -> tuple:
@@ -44,12 +41,12 @@ class DataSet:
         :param out_path:
         :return:
         """
-        self.data["rand"] = random.uniform(0, 1, len(self.data))
+        self.data['rand'] = random.uniform(0, 1, len(self.data))
         self.data.sort_values(by="rand", inplace=True)  # 对data随机排序
         self.data.drop('rand', axis=1, inplace=True)
         self.weak_data = self.data[:400]
-        self.weak_data.to_csv(out_path + '_weak.csv', encoding="utf-8")
-        self.strong_data.to_csv(out_path + '_strong.csv', encoding="utf-8")
+        self.weak_data.to_csv(out_path + '_weak.csv', encoding='utf-8')
+        self.strong_data.to_csv(out_path + '_strong.csv', encoding='utf-8')
         self.strong_data = self.data[400:]
         return self.weak_data, self.strong_data
 
@@ -79,11 +76,6 @@ class DataSet:
             d['孤残学生'] |= data["突发事件情况"].str.contains("父母双亡|父母去世|孤残|孤儿|重大疾病、突发意外致残|本人视力残疾|本人严重烫伤", na=False)
         d["军烈属或优抚子女"] = data["享受国家政策资助情况"].str.contains("军烈属", na=False)
         return d
-
-    @staticmethod
-    def _do_income(s: str):
-        # don't know how
-        pass
 
     @staticmethod
     def do_income(data: pd.Series, fill_to_no_income: bool = True) -> pd.DataFrame:
@@ -193,7 +185,7 @@ class DataSet:
         invalid_member = {"爸爸", "父亲", "妈妈", "母亲", "爷爷", "奶奶", "外祖父", "外祖母", "姥爷", "姥姥", "伯伯", "婆婆", "外公", "外婆"}
         invalid_sp_member = {"爸", "妈", "爷", "奶", "祖父", "祖母", "父", "母"}
 
-        grad = {"幼儿园毕业", "刚毕业", "小学毕业", "小学未毕业", "初中毕业", "初中未毕业", "高中毕业", "大专毕业", "专科毕业", "大学毕业", "三本毕业", "本科毕业",
+        grad = {"幼儿园毕业", "刚毕业", "小学毕业", "小学未毕业", "初中毕业", "初中未毕业", "高中毕业", "大专毕业", "专科毕业", "大学毕业", "三本毕业",
                 "应届毕业", "大学已毕业", "大学刚毕业", "本科毕业", "研究生毕业", "硕士毕业", "博士毕业"}
         sp_grad = {"毕业", "未受教育", "未接受教育", "文盲", "无学历", "没上过学", "肄业", "未上学"}
         college = {"研究生", "读研", "博士", "硕士", "大学", "本科", "专升本", "大学生", "河工大"}
@@ -748,46 +740,42 @@ class DataSet:
     @staticmethod
     def do_scholarship(data: pd.Series) -> pd.DataFrame:
         d = pd.DataFrame()
-        d["在校受奖励资助情况"] = data["在校受奖励资助情况"].fillna('无')
+        d['在校受奖励资助情况'] = data['在校受奖励资助情况'].fillna('无')
+        scholar_map = {
+                    '慧明': 5000, '欧莱雅': 5000, '喜来健': 5000, '中海油': 5000,
+                    '承锋': 5000, '清茗雅轩': 3000, '盛帆':3000, '福慧': 2000,
+                    '柏年': 2000, '圣恩纳': 2000, '香港好友':2000, '国泰':5000,
+                    '思源': 4000, '宋声扬': 5000, '长城': 3000, '交通': 2500,
+                    '冯顾丽华': 2000, '电装': 3000, '圆梦启航': 6600
+                }
 
-        d['圆梦启航'] = d["在校受奖励资助情况"].str.contains("圆梦启航")
-        d["慧明"] = d["在校受奖励资助情况"].str.contains("慧明")
-        d['欧莱雅'] = d["在校受奖励资助情况"].str.contains('欧莱雅')
-        d['喜来健'] = d["在校受奖励资助情况"].str.contains("喜来健")
-        d['中海油'] = d["在校受奖励资助情况"].str.contains("中海油")
-        d['承锋'] = d["在校受奖励资助情况"].str.contains("承锋")
-        d['宋声扬'] = data["在校受奖励资助情况"].str.contains("宋声扬")
-        d['国泰'] = data["在校受奖励资助情况"].str.contains("国泰")
-        d['思源'] = data["在校受奖励资助情况"].str.contains("思源")
-        d['清茗雅轩'] = data["在校受奖励资助情况"].str.contains("清茗雅轩")
-        d['盛帆'] = data["在校受奖励资助情况"].str.contains("盛帆")
-        d['长城'] = data["在校受奖励资助情况"].str.contains("长城")
-        d['电装'] = data["在校受奖励资助情况"].str.contains("电装")
-        d['交通'] = data["在校受奖励资助情况"].str.contains("交通")
-        d['福慧'] = data["在校受奖励资助情况"].str.contains("福慧")
+        def func(x):
+            cnt = 0
+            tot = 0
+            is_national = 0
+            for k, v in scholar_map.items():
+                if k in x:
+                    cnt += 1
+                    tot += v
+            if '国家' in x or '国助' in x:
+                cnt += 1
+                if "一" in x:
+                    is_national = 2
+                    tot += 3800
+                else:
+                    is_national = 1
+                    tot += 2800
+            return (cnt, tot, is_national)
 
-        index = data["在校受奖励资助情况"].str.contains("柏年")
-        data.loc[index, "柏年"] = 1
-        data.loc[-index, "柏年"] = 0
+        d['tmp'] = d['在校受奖励资助情况'].apply(func)
+        d[['助学金个数','助学金金额','国助类型']] = d['tmp'].apply(pd.Series)
+        d.drop(['在校受奖励资助情况', 'tmp'], axis=1, inplace=True)
+        return d
 
-        index = data["在校受奖励资助情况"].str.contains("圣恩纳")
-        data.loc[index, "圣恩纳"] = 1
-        data.loc[-index, "圣恩纳"] = 0
+    @staticmethod
+    def do_resident():
+        pass
 
-        index = data["在校受奖励资助情况"].str.contains("香港好友")
-        data.loc[index, "香港好友"] = 1
-        data.loc[-index, "香港好友"] = 0
-
-        index = data["在校受奖励资助情况"].str.contains("冯顾丽华")
-        data.loc[index, "冯顾丽华"] = 1
-        data.loc[-index, "冯顾丽华"] = 0
-
-        index = ((data["在校受奖励资助情况"].str.contains("国家")) | (data["在校受奖励资助情况"].str.contains("国助"))) & (
-            data["在校受奖励资助情况"].str.contains("一"))
-        data.loc[index, "国家一等助学金"] = 1
-        data.loc[-index, "国家一等助学金"] = 0
-
-        index = ((data["在校受奖励资助情况"].str.contains("国家")) | (data["在校受奖励资助情况"].str.contains("国助"))) & (
-            ~ (data["在校受奖励资助情况"].str.contains("一")))
-        data.loc[index, "国家二等助学金"] = 1
-        data.loc[-index, "国家二等助学金"] = 0
+    @staticmethod
+    def do_household():
+        
