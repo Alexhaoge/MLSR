@@ -16,7 +16,9 @@ class DataSet:
             self.strong_data = None
         else:
             self.weak_data = pd.read_csv(weak_file, encoding=encode)
+            self.weak_data = self.weak_data.apply(lambda x: x.replace("\n", ""))
             self.strong_data = pd.read_csv(strong_file, encoding=encode)
+            self.strong_data = self.strong_data.apply(lambda x: x.replace("\n", ""))
 
     @staticmethod
     def special_init(data: pd.DataFrame) -> pd.DataFrame:
@@ -79,9 +81,15 @@ class DataSet:
 
     @staticmethod
     def do_income(data: pd.Series, fill_to_no_income: bool = True) -> pd.DataFrame:
+        """
+        家庭主要经济来源
+        Args:
+            data:
+            fill_to_no_income:
 
-        # 家庭主要经济来源，这一项每人只有一种选择（主要经济来源）
+        Returns:
 
+        """
         if fill_to_no_income:
             data["家庭主要经济来源"] = data["家庭主要经济来源"].fillna('父母均下岗')
         d = pd.DataFrame()
@@ -153,7 +161,7 @@ class DataSet:
         （个数 ->）家庭成员 -> 学校/年级/学校&年级 -> 学校/年级/学校&年级 -> 非学校或年级：首先保证两个学校阶段相同，则这种家庭成员分别属于这个阶段；否则人工处理
 
         Args:
-            s:
+            s: 输入的pandas.Series
 
         Returns:
 
@@ -285,11 +293,6 @@ class DataSet:
                     cut_type.append("others")
                     cut_loc.append(loc - 1)
 
-            #         print(str)
-            #         print(output)
-            #         print(cut_type)
-            #         print(cut_loc)
-            
             serial = 0
             cut_type.append(" ")
             cut_type.append(" ")  # 确保检测到最后一位也能检测其后两位的元素的词性
@@ -435,7 +438,14 @@ class DataSet:
 
     @staticmethod
     def do_accident(s: pd.Series):
-        # 突发事件情况
+        """
+        突发事件情况
+        Args:
+            s:
+
+        Returns:
+
+        """
         s = s.fillna('无')
         zero_tmp1 = ['无', '否', '没有', '正常', '暂无']
         s = s.apply(lambda x: '无' if x in zero_tmp1 else x)
@@ -587,11 +597,6 @@ class DataSet:
                     cut_type.append("serious_illness")
                     cut_loc.append(loc - 1)
 
-            #             print(str)
-            #             print(output)
-            #             print(cut_type)
-            #             print(cut_loc)
-
             #         在cut_type中找寻如下pattern，并总结出每个人发生什么事情：
             #         每一个人可能同时做多件事情，而这多件事情肯定是按顺序排列的，这些事情之间一定不出现另一个人名
             #         无论在哪里出现divorce，一定为父母离异，但是如果出现在“父母”之后，则需要把这个“父母”与divorce绑定
@@ -701,7 +706,7 @@ class DataSet:
 
                             # 一个pattern中的词已经全部找到，对该pattern进行考察
                             if ((flag_grand_parents or flag_sp_grand_parents) and (
-                                        flag_illness or flag_serious_illness)):
+                                    flag_illness or flag_serious_illness)):
                                 df.loc[row, "祖父母患病"] = 1
 
                             if flag_divorce:
@@ -739,15 +744,23 @@ class DataSet:
 
     @staticmethod
     def do_scholarship(data: pd.Series) -> pd.DataFrame:
+        """
+
+        Args:
+            data:
+
+        Returns:
+
+        """
         d = pd.DataFrame()
         d['在校受奖励资助情况'] = data['在校受奖励资助情况'].fillna('无')
         scholar_map = {
-                    '慧明': 5000, '欧莱雅': 5000, '喜来健': 5000, '中海油': 5000,
-                    '承锋': 5000, '清茗雅轩': 3000, '盛帆':3000, '福慧': 2000,
-                    '柏年': 2000, '圣恩纳': 2000, '香港好友':2000, '国泰':5000,
-                    '思源': 4000, '宋声扬': 5000, '长城': 3000, '交通': 2500,
-                    '冯顾丽华': 2000, '电装': 3000, '圆梦启航': 6600
-                }
+            '慧明': 5000, '欧莱雅': 5000, '喜来健': 5000, '中海油': 5000,
+            '承锋': 5000, '清茗雅轩': 3000, '盛帆': 3000, '福慧': 2000,
+            '柏年': 2000, '圣恩纳': 2000, '香港好友': 2000, '国泰': 5000,
+            '思源': 4000, '宋声扬': 5000, '长城': 3000, '交通': 2500,
+            '冯顾丽华': 2000, '电装': 3000, '圆梦启航': 6600
+        }
 
         def func(x):
             cnt = 0
@@ -765,17 +778,77 @@ class DataSet:
                 else:
                     is_national = 1
                     tot += 2800
-            return (cnt, tot, is_national)
+            return cnt, tot, is_national
 
         d['tmp'] = d['在校受奖励资助情况'].apply(func)
-        d[['助学金个数','助学金金额','国助类型']] = d['tmp'].apply(pd.Series)
+        d[['助学金个数', '助学金金额', '国助类型']] = d['tmp'].apply(pd.Series)
         d.drop(['在校受奖励资助情况', 'tmp'], axis=1, inplace=True)
         return d
 
     @staticmethod
-    def do_resident():
-        pass
+    def do_resident_type(s: pd.Series) -> pd.Series:
+        """
+
+        Args:
+            s:
+
+        Returns:
+
+        """
+        def func(x):
+            if x is None or x in ['汉']:
+                return None
+            else:
+                return ('非' in x) ^ ('农' in x)
+        return s.apply(func)
 
     @staticmethod
-    def do_household():
-        
+    def do_household(s: pd.Series) -> pd.Series:
+        """
+
+        Args:
+            s:
+
+        Returns:
+
+        """
+        to_be_replace = {
+            '一': '1', '二': '2', '三': '3', '四': '4', '五': '5', '六': '6',
+            '七': '7', '八': '8', '九': '9', '人': '', '口': ''
+        }
+
+        def func(x):
+            if isinstance(x, str):
+                for k, v in to_be_replace.items():
+                    x = x.replace(k, v)
+                return int(x)
+            else:
+                return x
+        return s.apply(func)
+
+    @staticmethod
+    def do_loan(s: pd.Series):
+        """
+
+        Args:
+            s:
+
+        Returns:
+
+        """
+        res = s.fillna('-')
+        yes_list = ['是', '√', '19500', '32000', '助学', '生源地', '校园', '扶贫', '学', '有', '贷款']
+        no_list = ['否', '无', '未', '-', '房', '50000', '10万', '借', '商业', '家', '父亲']
+
+        def fun(x):
+            loan = False
+            for i in yes_list:
+                if i in x:
+                    loan = True
+                    break
+            for j in no_list:
+                if j in x:
+                    return False
+            return loan
+        return res.apply(fun)
+
