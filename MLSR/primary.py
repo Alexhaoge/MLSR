@@ -90,7 +90,7 @@ def grid_search_and_result(
         Xtest: pd.DataFrame,
         ytest: pd.Series,
         pipe: Pipeline,
-        grid: map,
+        grid: dict,
         log_dir: str,
         score=None,
         verbose: int = 2):
@@ -148,10 +148,11 @@ def grid_search_and_result(
     return gsCV
 
 
-def do_decision_tree(dataset: DataSet, log_dir: str = '../log'):
+def do_decision_tree(dataset: DataSet, log_dir: str = '../log', grid: dict = None):
     """
 
     Args:
+        grid:
         dataset:
         log_dir:
 
@@ -159,15 +160,16 @@ def do_decision_tree(dataset: DataSet, log_dir: str = '../log'):
 
     """
     from sklearn.tree import DecisionTreeClassifier
-    grid = {
-        'dt__criterion': ['gini', 'entropy'],
-        'dt__max_features': ['auto', 'sqrt', 'log2'],
-        'dt__class_weight': [None, 'balanced'],
-        'dt__ccp_alpha': [0.0, 0.1],
-        'dt__min_impurity_decrease': [0., 0.01],
-        'dt__min_samples_leaf': [1, 5],
-        'dt__min_samples_split': [2, 8],
-    }
+    if grid is None:
+        grid = {
+            'dt__criterion': ['gini', 'entropy'],
+            'dt__max_features': ['auto', 'sqrt', 'log2'],
+            'dt__class_weight': [None, 'balanced'],
+            'dt__ccp_alpha': [0.0, 0.1],
+            'dt__min_impurity_decrease': [0., 0.01],
+            'dt__min_samples_leaf': [1, 5],
+            'dt__min_samples_split': [2, 8],
+        }
     pipe = Pipeline([
         ('scaler', MinMaxScaler()),
         ('dt', DecisionTreeClassifier())
