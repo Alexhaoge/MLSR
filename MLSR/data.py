@@ -5,31 +5,112 @@ from jieba import suggest_freq, cut
 
 class DataSet:
     """
-    Class for data set manipulation
+    数据处理的工具类
     """
 
-    def __init__(self, filename: str = '17_19_Data.csv', strong_file=None, weak_file=None, encode='gbk'):
-        if weak_file is None:
-            self.data = pd.read_csv(filename, encoding=encode)
-            self.data = self.data.apply(lambda x: x.replace("\n", ""))
-            self.weak_data = None
-            self.strong_data = None
+    def __init__(self, filename: str = None, encode='gbk'):
+        """
+        导入一个数据集，将原始特征、弱标签和细化的强标签分为features, label, strong_label
+        三个属性。label中特别困难为0，一般困难为1，不困难为2；strong_label将四个细化的困难级别
+        设为0~3，0最困难，且strong_label中不考虑“不困难”（也就是label=2）的情况。
+
+        Args:
+            filename: 文件路径
+            encode: 文件编码
+        """
+        self.features_name = {}
+        if filename is None:
+            self.features = pd.DataFrame()
+            self.label = pd.Series()
+            return
+        data = pd.read_csv(filename, encoding=encode)
+        data = data.apply(lambda x: x.replace("\n", ""))
+        if '专家判定等级' in data.columns:
+            self.strong_label = data['专家判定等级'] - 1
+            self.label = self.strong_label // 2
         else:
-            self.weak_data = pd.read_csv(weak_file, encoding=encode)
-            self.weak_data = self.weak_data.apply(lambda x: x.replace("\n", ""))
-            self.strong_data = pd.read_csv(strong_file, encoding=encode)
-            self.strong_data = self.strong_data.apply(lambda x: x.replace("\n", ""))
+            self.strong_label = pd.Series([None]*len(self.label))
+            self.label = data['院系认定贫困类型'].apply(lambda x: 0 if '特' in x else 1)
+        self.features = data.drop(['院系认定贫困类型', '专家判定等级'], axis=1, errors='ignore')
+
+    def merge(self, y):
+        """
+        将一个DataSet加入当前的DataSet尾部
+        Args:
+            y: 要加入的DataSet
+
+        Returns: 新的DataSet
+        todo Notes: 半监督时，strong_label合并有问题，使用静态的static_merge可以解决
+
+        """
+        self.features.append(y.features, ignore_index=True)
+        self.label.append(y.label, ignore_index=True)
+        self.strong_label.append(y.strong_label, ignore_index=True)
+        return self
 
     @staticmethod
+    def static_merge(x, y):
+        """
+        将DataSet y拼接到DataSet x后面，返回一个新的数据集
+        Args:
+            x: DataSet
+            y: DataSet
+
+        Returns: 新的DataSet
+        """
+        z = DataSet()
+        z.features_name = x.features_name
+        z.features = pd.concat([x.features, y.features], ignore_index=True)
+        z.label = pd.concat([x.label, y.label], ignore_index=True)
+        z.strong_label = pd.concat([x.strong_label, y.strong_label], ignore_index=True)
+        return z
+
+    def split_by_weak_label(self, reset_index: bool = True):
+        """
+        将初次分类的得到的结果中，评为特别困难和一般困难的分开挑出来
+        Returns: (DataSet, DataSet) 两个DataSet对象，第一个是特别困难，第二个是一般困难
+
+        """
+        x0 = DataSet()
+        x1 = DataSet()
+        index = self.label[self.label == 0].index
+        x0.features = self.features.take(index)
+        x0.label = self.label.take(index)
+        x0.strong_label = self.strong_label.take(index)
+        index = self.label[self.label == 1].index
+        x1.features = self.features.take(index)
+        x1.label = self.label.take(index)
+        x1.strong_label = self.strong_label.take(index)
+        x0.features_name = self.features_name
+        x1.features_name = self.features_name
+        if reset_index:
+            return x0.reset_index(), x1.reset_index()
+        else:
+            return x0, x1
+
+    def reset_index(self):
+        """
+        将数据及重新标号
+        Returns: 新的DataSet
+
+        """
+        self.features.reset_index(drop=True, inplace=True)
+        self.label.reset_index(drop=True, inplace=True)
+        self.strong_label.reset_index(drop=True, inplace=True)
+        return self
+
+    @staticmethod
+    @DeprecationWarning
     def special_init(data: pd.DataFrame) -> pd.DataFrame:
         """
         我们使用的数据集中的特殊处理
         一共有16个特征，发现第1772个数据在原数据集里列填串了，第8297个数据无标签，删去
-        院系、专业、民族、出生年月、校区没有用，删掉
+        院系、专业、出生年月、校区没有用，删掉
+        Warnings: 这个函数没什么用了，之后删掉
         Args:
-            data:
+            data:待处理的pandas.DataFrame
 
-        Returns:
+        Returns:特殊处理后的pandas.DataFrame
 
         """
         data = data[data.columns[:16]]
@@ -37,50 +118,52 @@ class DataSet:
         data.drop(['院系', '专业', '出生年月', '所在校区'], axis=1, inplace=True, errors='ignore')
         return data
 
-    def shuffle_and_pick(self, out_path: str = 'rand_select') -> tuple:
+    @staticmethod
+    @DeprecationWarning
+    def shuffle_and_pick(data, out_path: str = 'rand_select') -> tuple:
         """
         随机打乱后随机抽取的400个样本，用于人工再标注细化标签
-        :param out_path:
-        :return:
+        Warnings: 这个函数写得不太好，之后删掉
+        Args:
+            data:待处理数据，pandas.DataFrame
+            out_path:保存文件路径
+
+        Returns:划分后的两个pandas.DataFrame
+
         """
-        self.data['rand'] = random.uniform(0, 1, len(self.data))
-        self.data.sort_values(by="rand", inplace=True)  # 对data随机排序
-        self.data.drop('rand', axis=1, inplace=True)
-        self.weak_data = self.data[:400]
-        self.weak_data.to_csv(out_path + '_weak.csv', encoding='utf-8')
-        self.strong_data.to_csv(out_path + '_strong.csv', encoding='utf-8')
-        self.strong_data = self.data[400:]
-        return self.weak_data, self.strong_data
+        data['rand'] = random.uniform(0, 1, len(data))
+        data.sort_values(by="rand", inplace=True)  # 对data随机排序
+        data.drop('rand', axis=1, inplace=True)
+        weak_data = data[:400]
+        strong_data = data[400:]
+        weak_data.to_csv(out_path + '_weak.csv', encoding='utf-8')
+        strong_data.to_csv(out_path + '_strong.csv', encoding='utf-8')
+        return weak_data, strong_data
 
     @staticmethod
-    def do_nation_policy(data: pd.DataFrame,
-                         is_income_contained: bool = True,
-                         is_accident_contained: bool = True
-                         ) -> pd.DataFrame:
+    def do_nation_policy(data: pd.DataFrame) -> pd.DataFrame:
         """
         处理“享受国家政策资助情况”一列
         Args:
-            data:
-            is_income_contained:
-            is_accident_contained:
+            data: 待处理的pandas.DataFrame，建议传入所有特征
 
-        Returns:
+        Returns:pandas.DataFrame,分类哑变量
 
         """
         d = pd.DataFrame()
         d["建档立卡贫困户"] = data["享受国家政策资助情况"].str.contains("立卡", na=False)
         d["城乡低保户"] = data["享受国家政策资助情况"].str.contains("低保", na=False)
-        if is_income_contained:
+        if '家庭主要经济来源' in data.columns:
             d['城乡低保户'] |= data['家庭主要经济来源'].str.contains('低保|最低生活保障', na=False)
         d["五保户"] = data["享受国家政策资助情况"].str.contains("五保", na=False)
         d["孤残学生"] = data["享受国家政策资助情况"].str.contains("孤残", na=False)
-        if is_accident_contained:
+        if '突发事件情况' in data.columns:
             d['孤残学生'] |= data["突发事件情况"].str.contains("父母双亡|父母去世|孤残|孤儿|重大疾病、突发意外致残|本人视力残疾|本人严重烫伤", na=False)
         d["军烈属或优抚子女"] = data["享受国家政策资助情况"].str.contains("军烈属", na=False)
         return d
 
     @staticmethod
-    def do_income(data: pd.Series, fill_to_no_income: bool = True) -> pd.DataFrame:
+    def do_income(data: pd.DataFrame, fill_to_no_income: bool = True) -> pd.DataFrame:
         """
         家庭主要经济来源
         Args:
@@ -90,10 +173,10 @@ class DataSet:
         Returns:
 
         """
-        if fill_to_no_income:
-            data["家庭主要经济来源"] = data["家庭主要经济来源"].fillna('父母均下岗')
         d = pd.DataFrame()
-
+        d["家庭主要经济来源"] = data["家庭主要经济来源"]
+        if fill_to_no_income:
+            d["家庭主要经济来源"].fillna('父母均下岗', inplace=True)
         business_str = '生意|经营|从商|经商|地摊|摆摊|杂货铺|店|卖|' + \
                        '买|个体|餐|理发|手工|个体|水果摊|蒸馒头|股票'
         d['经商'] = data['家庭主要经济来源'].str.contains(business_str, na=False)
@@ -147,6 +230,7 @@ class DataSet:
                              '母亲上班|父亲收入|母亲收入|父亲无业'
         d['父母一方下岗'] = data['家庭主要经济来源'].apply(lambda x: True if x in one_unemployed_list else False)
         d['父母一方下岗'] |= data['家庭主要经济来源'].str.contains(one_unemployed_str, na=False)
+        d['家庭人均年收入'] = data['家庭人均年收入']
         return d
 
     @staticmethod
@@ -439,11 +523,18 @@ class DataSet:
     @staticmethod
     def do_accident(s: pd.Series):
         """
-        突发事件情况
+        识别突发事件情况
+        部分处理思路如下：
+        在cut_type中找寻如下pattern，并总结出每个人发生什么事情：
+        每一个人可能同时做多件事情，而这多件事情肯定是按顺序排列的，这些事情之间一定不出现另一个人名
+        无论在哪里出现divorce，一定为父母离异，但是如果出现在“父母”之后，则需要把这个“父母”与divorce绑定
+        这里jieba无法将“父母”、“父/母”、“父(母)”、“父亲（母亲）”分开，所以需要加一个判断条件，会用在后面无业、患病、去世中
+        一个人之后可能跟着多个illness，应全部与其绑定。若人是祖父母，则统计其是否患病；父母则看是否有重病，且应将父母辨别开；兄弟姐妹只统计重疾。
+        有可能出现人 -> illness ->dead。所有人都有可能dead，dead需要与之前最近的一个人或连续的多个人绑定，但只统计父或母去世。
         Args:
-            s:
+            s:待处理的pandas.Series
 
-        Returns:
+        Returns:处理后得到的哑变量特征，pandas.Dataframe格式
 
         """
         s = s.fillna('无')
@@ -502,7 +593,7 @@ class DataSet:
             "脑结核", "半身不遂", "致盲", "病危", "再生性贫血障碍", "生活无法自理", "做手术"
         }
 
-        suggetst_word = [
+        suggest_word = [
             '严重肾病', '肾病综合征', '失去劳动力', '丧失劳动力', '丧失行动力',
             '无法劳作', '不能劳作', '失去部分劳动力', '失去部分劳动力', '失去行动能力',
             '丧失劳动能力', '无法承受过重劳动', '心脑血管疾病', '心脑疾病', '肺腺癌',
@@ -513,7 +604,7 @@ class DataSet:
             '未有收入', '脑垂体瘤', '病了', '再生性贫血障碍', '摔了', '生活无法自理',
             '失去稳定工作', '没能工作', '旧病复发', '摔到'
         ]
-        for _word in suggetst_word:
+        for _word in suggest_word:
             suggest_freq(tuple(_word), True)
         suggest_split = [
             ('癫痫', '病'), ('卧床', '不起'), ('黑色素', '瘤'), ('单亲', '家庭'), ('恶性', '肿瘤'),
@@ -529,7 +620,7 @@ class DataSet:
             "父亲（母亲）患重疾", "父母患重疾", "父亲（母亲）去世", "突发重大自然灾害"
         ])
         index = s.str.contains(
-            "灾|病虫害|霜冻|地震|台风|洪水|大水|大旱|干旱|冰雹|暴风雨|暴雨|下雪|雷劈|" +
+            "灾|病虫害|霜冻|地震|台风|洪水|大水|大旱|干旱|冰雹|暴风雨|暴雨|下雪|雷劈|自然状况|" +
             "禽流感|高温|减产|倒伏|淹|涝|庄稼大量死亡|自然状况|自然天气状况|减产|泥石流|猪瘟|庄稼无收")
         adjusted_index = 0  # 由于index中少了一些索引，无法直接匹配到df中，需要调整index
         for i in index:
@@ -597,13 +688,6 @@ class DataSet:
                     cut_type.append("serious_illness")
                     cut_loc.append(loc - 1)
 
-            #         在cut_type中找寻如下pattern，并总结出每个人发生什么事情：
-            #         每一个人可能同时做多件事情，而这多件事情肯定是按顺序排列的，这些事情之间一定不出现另一个人名
-            #         无论在哪里出现divorce，一定为父母离异，但是如果出现在“父母”之后，则需要把这个“父母”与divorce绑定
-            #         这里jieba无法将“父母”、“父/母”、“父(母)”、“父亲（母亲）”分开，所以需要加一个判断条件，会用在后面无业、患病、去世中
-            #         一个人之后可能跟着多个illness，应全部与其绑定。若人是祖父母，则统计其是否患病；父母则看是否有重病，且应将父母辨别开；兄弟姐妹只统计重疾。
-            #         有可能出现人 -> illness ->dead。所有人都有可能dead，dead需要与之前最近的一个人或连续的多个人绑定，但只统计父或母去世。
-
             serial = 0
             cut_type.append(" ")
             cut_type.append(" ")  # 确保检测到最后一位也能检测其后两位的元素的词性
@@ -629,8 +713,9 @@ class DataSet:
 
                 # 每一个pattern起始的词只能为家庭成员
                 if (cut_type[serial] in [
-                    "dad", "mom", "grand_parents", "sp_grand_parents",
-                    "siblings", "sp_siblings", "invalid_member"]):
+                        "dad", "mom", "grand_parents", "sp_grand_parents",
+                        "siblings", "sp_siblings", "invalid_member"
+                ]):
                     current_group.append(cut_type[serial])
                     current_loc.append(cut_loc[serial])  # 用来判断父母是否连着
 
@@ -743,17 +828,18 @@ class DataSet:
         return df
 
     @staticmethod
-    def do_scholarship(data: pd.Series) -> pd.DataFrame:
+    def do_scholarship(s: pd.Series) -> pd.DataFrame:
         """
-
+        识别在校期间获得助学金情况
         Args:
-            data:
+            s:待处理的特征，pandas.Series
 
-        Returns:
+        Returns:返回三个特征的pandas.DataFrame，助学金个数（离散），助学金总金额（连续），
+        获得的国家助学金类型（分类变量，0为未获得，1为国家二等助学金，2为国家一等助学金）
 
         """
         d = pd.DataFrame()
-        d['在校受奖励资助情况'] = data['在校受奖励资助情况'].fillna('无')
+        d['在校受奖励资助情况'] = s.fillna('无')
         scholar_map = {
             '慧明': 5000, '欧莱雅': 5000, '喜来健': 5000, '中海油': 5000,
             '承锋': 5000, '清茗雅轩': 3000, '盛帆': 3000, '福慧': 2000,
@@ -788,30 +874,27 @@ class DataSet:
     @staticmethod
     def do_resident_type(s: pd.Series) -> pd.Series:
         """
-
+        识别户口类型，缺失值视为城镇户口
         Args:
-            s:
+            s:待处理的特征，pandas.Series
 
-        Returns:
+        Returns:返回pandas.Series
 
         """
-        def func(x):
-            if x is None or x in ['汉']:
-                return None
-            else:
-                return ('非' in x) ^ ('农' in x)
-        return s.apply(func)
+        d = s.fillna('城镇')
+        return d.apply(lambda x: ('非' in x) ^ ('农' in x))
 
     @staticmethod
     def do_household(s: pd.Series) -> pd.Series:
         """
-
+        识别家庭人口数量，缺失则视为三口之家
         Args:
-            s:
+            s:待处理的特征，pandas.Series
 
-        Returns:
+        Returns:返回pandas.Series
 
         """
+        d = s.fillna(3)
         to_be_replace = {
             '一': '1', '二': '2', '三': '3', '四': '4', '五': '5', '六': '6',
             '七': '7', '八': '8', '九': '9', '人': '', '口': ''
@@ -821,19 +904,18 @@ class DataSet:
             if isinstance(x, str):
                 for k, v in to_be_replace.items():
                     x = x.replace(k, v)
-                return int(x)
-            else:
-                return x
-        return s.apply(func)
+            return int(x)
+        return d.apply(func)
 
     @staticmethod
     def do_loan(s: pd.Series):
         """
-
+        识别是否贷款，缺失值视为无贷款
+        Notes: 只识别生源地和校园地助学贷款，其他贷款不在认定考虑范围内
         Args:
-            s:
+            s:待处理的特征，pandas.Series
 
-        Returns:
+        Returns:返回pandas.Series
 
         """
         res = s.fillna('-')
@@ -852,3 +934,45 @@ class DataSet:
             return loan
         return res.apply(fun)
 
+    @staticmethod
+    def do_ethnic_group(s: pd.Series) -> pd.Series:
+        """
+        识别是否为少数民族，缺失值视为汉族
+        Args:
+            s: 待处理的特征，pandas.Series
+
+        Returns:返回pandas.Series
+
+        """
+        d = s.fillna('汉')
+        return d.apply(lambda x: False if '汉' in x else True)
+
+    def generate_feature(self):
+        """
+        按顺序将原始特征转为可使用的特征，并将特征重命名为f1,f2,f3....
+        Returns:处理好的DataSet对象，特征名映射在features_name属性中
+
+        """
+        d = [
+            DataSet.do_nation_policy(self.features[['享受国家政策资助情况', '突发事件情况', '家庭主要经济来源']]),
+            DataSet.do_income(self.features[['家庭主要经济来源', '家庭人均年收入']]),
+            DataSet.do_education(self.features['家庭其他成员在受教育情况']),
+            DataSet.do_accident(self.features['突发事件情况']),
+            DataSet.do_scholarship(self.features['在校受奖励资助情况']),
+            DataSet.do_ethnic_group(self.features['民族']),
+            DataSet.do_household(self.features['家庭人口']),
+            DataSet.do_loan(self.features['是否贷款']),
+            DataSet.do_resident_type(self.features['入学前户口性质'])
+        ]
+        new_f = pd.concat(d, axis=1, copy=False)
+        new_f['父母均下岗'] |= new_f['父母均无业']
+        new_f['父母一方下岗'] |= new_f['父亲（母亲）无业']
+        new_f.drop(['父母均无业', '父亲（母亲）无业'], axis=1, inplace=True)
+        self.features = new_f
+        self.features_name = {'f' + str(i): x for i, x in enumerate(self.features.columns)}
+        self.features.columns = self.features_name.keys()
+        return
+
+    @staticmethod
+    def data_augment():
+        pass
