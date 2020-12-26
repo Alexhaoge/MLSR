@@ -126,7 +126,7 @@ def grid_search_and_result(
     gsCV.fit(Xtrain, ytrain)
     dump(gsCV, log_dir + '/gsCV')
     dump(gsCV.best_estimator_, log_dir + '/best_model')
-    file_prefix = log_dir + strftime("%Y_%m_%d_%H_%M_%S", localtime())
+    file_prefix = log_dir + strftime("/%Y_%m_%d_%H_%M_%S", localtime())
     file = open(file_prefix + '.log', 'x')
     if verbose > 2:
         file.write(gsCV.cv_results_.__str__())
@@ -139,7 +139,7 @@ def grid_search_and_result(
     file.write('Accuracy on test set: {}\n'.format(accuracy_score(ytest, test_prediction)))
     file.write('F1-score on test set: {}\n'.format(f1_score(ytest, test_prediction, average='macro')))
     if verbose:
-        cm = confusion_matrix(ytrain, best_model.transform(Xtrain))
+        cm = confusion_matrix(ytrain, best_model.predict(Xtrain))
         plot_confusion_matrix(cm, ['特别困难', '一般困难', '不困难'], file_prefix + '_train_cm.png')
         cm = confusion_matrix(ytest, test_prediction)
         plot_confusion_matrix(cm, ['特别困难', '一般困难', '不困难'], file_prefix + '_test_cm.png')
