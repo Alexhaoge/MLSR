@@ -91,13 +91,24 @@ class DataSet:
     def reset_index(self):
         """
         将数据及重新标号
-        Returns: 新的DataSet
+        Notes: 调用pandas.reset_index时inplace为True
+        Returns: 重新标号后的DataSet
 
         """
         self.features.reset_index(drop=True, inplace=True)
         self.label.reset_index(drop=True, inplace=True)
         self.strong_label.reset_index(drop=True, inplace=True)
         return self
+
+    def convert_to_ssl(self):
+        len_name = len(self.features_name)
+        self.features_name['f'+str(len_name)] = '院系认定贫困类型'
+        self.features['f'+str(len_name)] = self.label
+        index = self.label[self.label == 2].index
+        self.features.drop(index, inplace=True)
+        self.label.drop(index, inplace=True)
+        self.strong_label.drop(index, inplace=True)
+        return self.reset_index()
 
     @staticmethod
     @DeprecationWarning
