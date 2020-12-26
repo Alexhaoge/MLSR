@@ -3,7 +3,7 @@ from sklearn.model_selection import GridSearchCV, train_test_split
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.pipeline import Pipeline
 from sklearn.metrics import f1_score, accuracy_score
-from sklearn.metrics import confusion_matrix, plot_roc_curve
+from sklearn.metrics import confusion_matrix, plot_roc_curve, plot_det_curve, plot_precision_recall_curve
 from joblib import dump, load
 import numpy as np
 import pandas as pd
@@ -78,7 +78,7 @@ def plot_confusion_matrix(cm, classes, filename, title='Confusion matrix', cmap=
 
 def plot_roc(model, X, y, filename):
     ax = plt.gca()
-    dis = plot_roc_curve(model, X, y, ax=ax)
+    dis = plot_det_curve(model, X, y, ax=ax)
     dis.plot(ax=ax, alpha=0.8)
     plt.savefig(filename)
     plt.show()
@@ -126,7 +126,7 @@ def grid_search_and_result(
     gsCV.fit(Xtrain, ytrain)
     dump(gsCV, log_dir + '/gsCV')
     dump(gsCV.best_estimator_, log_dir + '/best_model')
-    file_prefix = log_dir + strftime("/%Y_%m_%d_%H_%M_%S", localtime())
+    file_prefix = log_dir + '/' + strftime("%Y_%m_%d_%H_%M_%S", localtime())
     file = open(file_prefix + '.log', 'x')
     if verbose > 2:
         file.write(gsCV.cv_results_.__str__())
@@ -141,9 +141,13 @@ def grid_search_and_result(
     if verbose:
         cm = confusion_matrix(ytrain, best_model.predict(Xtrain))
         plot_confusion_matrix(cm, ['特别困难', '一般困难', '不困难'], file_prefix + '_train_cm.png')
+        file.write('\ntrain_cm:\n')
+        file.write(cm.__str__())
         cm = confusion_matrix(ytest, test_prediction)
         plot_confusion_matrix(cm, ['特别困难', '一般困难', '不困难'], file_prefix + '_test_cm.png')
-        plot_roc(best_model, Xtest, ytest, file_prefix + '_roc.png')
+        file.write('\ntest_cm:\n')
+        file.write(cm.__str__())
+#         plot_roc(best_model, Xtest, ytest, file_prefix + '_roc.png')
     file.close()
     return gsCV
 
