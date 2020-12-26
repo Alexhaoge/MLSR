@@ -29,7 +29,7 @@ class DataSet:
             self.strong_label = data['专家判定等级'] - 1
             self.label = self.strong_label // 2
         else:
-            self.strong_label = pd.Series([None]*len(self.label))
+            self.strong_label = pd.Series([None] * len(data))
             self.label = data['院系认定贫困类型'].apply(lambda x: 0 if '特' in x else 1)
         self.features = data.drop(['院系认定贫困类型', '专家判定等级'], axis=1, errors='ignore')
 
@@ -231,6 +231,7 @@ class DataSet:
         d['父母一方下岗'] = data['家庭主要经济来源'].apply(lambda x: True if x in one_unemployed_list else False)
         d['父母一方下岗'] |= data['家庭主要经济来源'].str.contains(one_unemployed_str, na=False)
         d['家庭人均年收入'] = data['家庭人均年收入']
+        d.drop('家庭主要经济来源', inplace=True, axis=1, errors='ignore')
         return d
 
     @staticmethod
@@ -713,8 +714,8 @@ class DataSet:
 
                 # 每一个pattern起始的词只能为家庭成员
                 if (cut_type[serial] in [
-                        "dad", "mom", "grand_parents", "sp_grand_parents",
-                        "siblings", "sp_siblings", "invalid_member"
+                    "dad", "mom", "grand_parents", "sp_grand_parents",
+                    "siblings", "sp_siblings", "invalid_member"
                 ]):
                     current_group.append(cut_type[serial])
                     current_loc.append(cut_loc[serial])  # 用来判断父母是否连着
@@ -905,6 +906,7 @@ class DataSet:
                 for k, v in to_be_replace.items():
                     x = x.replace(k, v)
             return int(x)
+
         return d.apply(func)
 
     @staticmethod
@@ -932,6 +934,7 @@ class DataSet:
                 if j in x:
                     return False
             return loan
+
         return res.apply(fun)
 
     @staticmethod
@@ -974,5 +977,60 @@ class DataSet:
         return
 
     @staticmethod
-    def data_augment():
-        pass
+    def data_augment(n: int = 1000, filename: str = None):
+        """数据增强
+        一般数据集中没有非经济困难的，但是这样的模型并不够鲁棒，
+        所以我们需要按照一定规则生成非困难的样本，增强数据
+        Notes: 收入肯定不是正态分布的，但是想不好用什么，暂时采用对数正态，然后把低保线设在5%分位数
+
+        Args:
+            n: 生成的数据条数
+            filename: 生成数据的保存路径
+
+        Returns: DataSet对象
+
+        """
+        d = DataSet()
+        d.features_name = {
+            'f0': '建档立卡贫困户', 'f1': '城乡低保户', 'f2': '五保户', 'f3': '孤残学生',
+            'f4': '军烈属或优抚子女', 'f5': '经商', 'f6': '务农', 'f7': '退休',
+            'f8': '低保', 'f9': '打工', 'f10': '父母均下岗', 'f11': '父母一方下岗',
+            'f12': '家庭人均年收入', 'f13': '大学', 'f14': '高中', 'f15': '义务教育',
+            'f16': '祖父母患病', 'f17': '父母离异', 'f18': '父亲（母亲）患普通疾病',
+            'f19': '父母患普通疾病', 'f20': '兄弟姐妹患重疾', 'f21': '父亲（母亲）患重疾',
+            'f22': '父母患重疾', 'f23': '父亲（母亲）去世', 'f24': '突发重大自然灾害',
+            'f25': '助学金个数', 'f26': '助学金金额', 'f27': '国助类型', 'f28': '民族',
+            'f29': '家庭人口', 'f30': '是否贷款', 'f31': '入学前户口性质'
+        }
+        d.label = pd.Series([2] * n)
+        d.strong_label = pd.Series([None] * n)
+        f = pd.DataFrame()
+        for i in ['f0', 'f1', 'f2', 'f3', 'f8', 'f25', 'f26', 'f27', 'f30']:
+            f[i] = pd.Series(zeros(n, dtype='int32'))
+        f['f4'] = pd.Series(random.binomial(1, 0.002, n))
+        f['f10'] = pd.Series(random.binomial(1, 0.002, n))
+        f['f11'] = pd.Series(random.binomial(1, 0.02, n))
+        f['f12'] = pd.Series(random.lognormal(10.1811, 0.1892, n))
+        f['f13'] = pd.Series(random.binomial(3, 0.01, n))
+        f['f14'] = pd.Series(random.binomial(3, 0.01, n))
+        f['f15'] = pd.Series(random.binomial(3, 0.035, n))
+        f['f16'] = pd.Series(random.binomial(1, 0.15, n))
+        f['f17'] = pd.Series(random.binomial(1, 0.01, n))
+        f['f18'] = pd.Series(random.binomial(1, 0.01, n))
+        f['f19'] = pd.Series(random.binomial(1, 0.05, n))
+        f['f20'] = pd.Series(random.binomial(1, 0.003, n))
+        f['f21'] = pd.Series(random.binomial(1, 0.008, n))
+        f['f22'] = pd.Series(random.binomial(1, 0.00036, n))
+        f['f23'] = pd.Series(random.binomial(1, 0.008, n))
+        f['f24'] = pd.Series(random.binomial(1, 0.01, n))
+        f['f28'] = pd.Series(random.binomial(1, 0.05, n))
+        f['f29'] = pd.Series(random.binomial(7, 0.4, n))
+        f['f31'] = pd.Series(random.binomial(1, 0.1, n))
+        f['source'] = f['f31'].apply(lambda x: random.random_integers(1, 15 if x else 7))
+        f['f5'] = f['source'].apply(lambda x: x & 1)
+        f['f7'] = f['source'].apply(lambda x: (x >> 1) & 1)
+        f['f9'] = f['source'].apply(lambda x: (x >> 2) & 1)
+        f['f6'] = f['source'].apply(lambda x: (x >> 3) & 1)
+        f.drop('source', axis=1, inplace=True)
+        d.features = f
+        return d
