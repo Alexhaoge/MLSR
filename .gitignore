@@ -1,6 +1,7 @@
 # data with privacy issues
 /data/*
 !/data/demo.csv
+/experiment/*
 
 # Byte-compiled / optimized / DLL files
 .idea/
