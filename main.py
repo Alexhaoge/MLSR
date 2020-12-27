@@ -17,6 +17,8 @@ def get_arguments():
 
 
 if __name__ == '__main__':
+    import warnings
+    warnings.filterwarnings("ignore")
     args = get_arguments()
     x = DataSet('data/rand_select_400_avg.csv')
     x.generate_feature()

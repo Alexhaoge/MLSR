@@ -10,6 +10,7 @@ import pandas as pd
 from time import strftime, localtime
 from .data import DataSet
 from .plot import plot_confusion_matrix
+from os import mkdir
 
 
 def lower_bound(cv_results):
@@ -84,6 +85,8 @@ def grid_search_and_result(
     Returns:
 
     """
+    file_prefix = log_dir + '/' + strftime("%Y_%m_%d_%H_%M_%S", localtime())
+    file = open(file_prefix + '.log.txt', 'x')
     scoring = score
     if scoring is None:
         scoring = {
@@ -100,8 +103,6 @@ def grid_search_and_result(
     gsCV.fit(Xtrain, ytrain)
     dump(gsCV, log_dir + '/gsCV')
     dump(gsCV.best_estimator_, log_dir + '/best_model')
-    file_prefix = log_dir + '/' + strftime("%Y_%m_%d_%H_%M_%S", localtime())
-    file = open(file_prefix + '.log.txt', 'x')
     if verbose > 2:
         file.write(gsCV.cv_results_.__str__())
     if verbose:
@@ -204,13 +205,18 @@ def do_svm(dataset: DataSet, log_dir: str = '../log', grid: dict = None):
     if grid is None:
         grid = {
             'SVM__kernel': ['linear', 'rbf', 'poly', 'sigmoid'],
-            'SVM__C': [0.1, 1, 10, 100],  # 这里数字是随机给的，无根据
-            'SVM__gamma': [1, 0.1, 0.01, 0.001],  # 这里数字是随机给的，无根据
+            'SVM__C': [0.01, 0.1, 0.5, 1, 5, 10, 100],
+            'SVM__gamma': [0.0001, 0.001, 0.01, 'scale', 'auto'],
+            'SVM__degree': [3, 5],
             'SVM__decision_function_shape': ['ovo', 'ovr'],
+            'SVM__class_weight': [None, 'balanced'],
+            'SVM__max_iter': [-1, 300],
+            'SVM__break_ties': [True, False],
+            'SVM__shrinking': [True, False]
         }
     pipe = Pipeline([
         ('scaler', MinMaxScaler()),
-        ('SVM', SVC())
+        ('SVM', SVC(cache_size=500))
     ])
     Xtrain, Xtest, ytrain, ytest = train_test_split(dataset.features, dataset.label, train_size=0.7)
     return grid_search_and_result(Xtrain, ytrain, Xtest, ytest, pipe, grid, log_dir)
@@ -230,13 +236,18 @@ def do_logistic(dataset: DataSet, log_dir: str = '../log', grid: dict = None):
     from sklearn.linear_model import LogisticRegression
     if grid is None:
         grid = {
-            'Logistic__penalty': ['l1', 'l2'],
-            'Logistic__C': np.logspace(-4, 4, 20),  # 这里数字是随机给的，无根据
-            'Logistic__solver': ['lbfgs', 'liblinear'],
+            'Logistic__penalty': ['l1', 'l2', 'elasticnet', 'none'],
+            'Logistic__C': [0.0001, 0.001, 0.01, 0.1, 1, 2, 5, 10, 100, 1000],  # 这里数字是随机给的，无根据
+            'Logistic__solver': ['lbfgs', 'liblinear', 'newton-cg', 'sag', 'saga'],
+            'Logistic__fit_intercept': [True, False],
+            'Logistic__dual': [True, False],
+            'l1_ratio': [True, False],
+            'warm_start': [True, False],
+            'intercept_scaling': [0.01, 0.1, 0.5, 1, 2, 5, 10]
         }
     pipe = Pipeline([
         ('scaler', MinMaxScaler()),
-        ('Logistic', LogisticRegression())
+        ('Logistic', LogisticRegression(n_jobs=-1, max_iter=500))
     ])
     Xtrain, Xtest, ytrain, ytest = train_test_split(dataset.features, dataset.label, train_size=0.7)
     return grid_search_and_result(Xtrain, ytrain, Xtest, ytest, pipe, grid, log_dir)
@@ -253,14 +264,14 @@ def do_naive_bayes(dataset: DataSet, log_dir: str = '../log', grid: dict = None)
     Returns:返回训练好的GridSearchCV模型
 
     """
-    from sklearn.naive_bayes import MultinomialNB
+    from sklearn.naive_bayes import GaussianNB
     if grid is None:
         grid = {
-            'NB__alpha': [1, 0.1, 0.01, 0.001, 0.0001, 0.00001],
+            'NB__var_smoothing': [1e-10, 1e-9, 1e-8, 1e-6, 1e-4, 1e-2, 1],
         }
     pipe = Pipeline([
         ('scaler', MinMaxScaler()),
-        ('NB', MultinomialNB())
+        ('NB', GaussianNB())
     ])
     Xtrain, Xtest, ytrain, ytest = train_test_split(dataset.features, dataset.label, train_size=0.7)
     return grid_search_and_result(Xtrain, ytrain, Xtest, ytest, pipe, grid, log_dir)

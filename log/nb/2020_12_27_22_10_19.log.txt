@@ -1,0 +1,13 @@
+{'cv': 5, 'error_score': nan, 'estimator__memory': None, 'estimator__steps': [('scaler', MinMaxScaler()), ('NB', GaussianNB())], 'estimator__verbose': False, 'estimator__scaler': MinMaxScaler(), 'estimator__NB': GaussianNB(), 'estimator__scaler__clip': False, 'estimator__scaler__copy': True, 'estimator__scaler__feature_range': (0, 1), 'estimator__NB__priors': None, 'estimator__NB__var_smoothing': 1e-09, 'estimator': Pipeline(steps=[('scaler', MinMaxScaler()), ('NB', GaussianNB())]), 'n_jobs': -1, 'param_grid': {'NB__var_smoothing': [1e-10, 1e-09, 1e-08, 1e-06, 0.0001, 0.01, 1]}, 'pre_dispatch': '2*n_jobs', 'refit': 'f1', 'return_train_score': False, 'scoring': {'f1': 'f1_macro', 'accuracy': 'accuracy'}, 'verbose': 2}
+Best score on training set by grid search cross validation: 0.63726120359635
+Accuracy on test set: 0.6229449606862044
+F1-score on test set: 0.6421404665788293
+
+train_cm:
+[[1267 1442  137]
+ [ 532 2083  368]
+ [   4    7  688]]
+test_cm:
+[[492 654  58]
+ [204 952 137]
+ [  0   2 299]]
