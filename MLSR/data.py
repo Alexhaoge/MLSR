@@ -13,7 +13,7 @@ class DataSet:
         导入一个数据集，将原始特征、弱标签和细化的强标签分为features, label, strong_label
         三个属性。label中特别困难为0，一般困难为1，不困难为2；strong_label将四个细化的困难级别
         设为0~3，0最困难，且strong_label中不考虑“不困难”（也就是label=2）的情况。
-
+        为和Scikit-learn输入保持一致，无强标签的数据，strong_label=-1。
         Args:
             filename: 文件路径
             encode: 文件编码
@@ -29,7 +29,7 @@ class DataSet:
             self.strong_label = data['专家判定等级'] - 1
             self.label = self.strong_label // 2
         else:
-            self.strong_label = pd.Series([None] * len(data))
+            self.strong_label = pd.Series([-1] * len(data))
             self.label = data['院系认定贫困类型'].apply(lambda x: 0 if '特' in x else 1)
         self.features = data.drop(['院系认定贫困类型', '专家判定等级'], axis=1, errors='ignore')
 
@@ -40,7 +40,6 @@ class DataSet:
             y: 要加入的DataSet
 
         Returns: 新的DataSet
-        todo Notes: 半监督时，strong_label合并有问题，使用静态的static_merge可以解决
 
         """
         self.features.append(y.features, ignore_index=True)
@@ -101,6 +100,11 @@ class DataSet:
         return self
 
     def convert_to_ssl(self):
+        """将数据集转为半监督任务用的数据集
+        将弱标签作为一个新的特征，并且删去非困难的数据
+        Returns: DataSet对象
+
+        """
         len_name = len(self.features_name)
         self.features_name['f'+str(len_name)] = '院系认定贫困类型'
         self.features['f'+str(len_name)] = self.label
@@ -1014,7 +1018,7 @@ class DataSet:
             'f29': '家庭人口', 'f30': '是否贷款', 'f31': '入学前户口性质'
         }
         d.label = pd.Series([2] * n)
-        d.strong_label = pd.Series([None] * n)
+        d.strong_label = pd.Series([-1] * n)
         f = pd.DataFrame()
         for i in ['f0', 'f1', 'f2', 'f3', 'f8', 'f25', 'f26', 'f27', 'f30']:
             f[i] = pd.Series(zeros(n, dtype='int32'))

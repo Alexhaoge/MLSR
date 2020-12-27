@@ -1,0 +1,13 @@
+{'cv': 5, 'error_score': nan, 'estimator__memory': None, 'estimator__steps': [('scaler', MinMaxScaler()), ('dt', DecisionTreeClassifier())], 'estimator__verbose': False, 'estimator__scaler': MinMaxScaler(), 'estimator__dt': DecisionTreeClassifier(), 'estimator__scaler__clip': False, 'estimator__scaler__copy': True, 'estimator__scaler__feature_range': (0, 1), 'estimator__dt__ccp_alpha': 0.0, 'estimator__dt__class_weight': None, 'estimator__dt__criterion': 'gini', 'estimator__dt__max_depth': None, 'estimator__dt__max_features': None, 'estimator__dt__max_leaf_nodes': None, 'estimator__dt__min_impurity_decrease': 0.0, 'estimator__dt__min_impurity_split': None, 'estimator__dt__min_samples_leaf': 1, 'estimator__dt__min_samples_split': 2, 'estimator__dt__min_weight_fraction_leaf': 0.0, 'estimator__dt__random_state': None, 'estimator__dt__splitter': 'best', 'estimator': Pipeline(steps=[('scaler', MinMaxScaler()), ('dt', DecisionTreeClassifier())]), 'n_jobs': -1, 'param_grid': {'dt__criterion': ['gini', 'entropy'], 'dt__max_features': ['auto', 'sqrt', 'log2'], 'dt__class_weight': [None, 'balanced'], 'dt__ccp_alpha': [0.0, 0.1], 'dt__min_impurity_decrease': [0.0, 0.01], 'dt__min_samples_leaf': [1, 5], 'dt__min_samples_split': [2, 8]}, 'pre_dispatch': '2*n_jobs', 'refit': 'f1', 'return_train_score': False, 'scoring': {'f1': 'f1_macro', 'accuracy': 'accuracy'}, 'verbose': 2}
+Best score on training set by grid search cross validation: 0.7146161936799843
+Accuracy on test set: 0.6386704789135097
+F1-score on test set: 0.6741766353551449
+
+train_cm:
+[[1889  949   12]
+ [ 754 2214   26]
+ [   3  235  446]]
+test_cm:
+[[706 488   6]
+ [399 864  19]
+ [  3  96 217]]

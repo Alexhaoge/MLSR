@@ -6,6 +6,7 @@ from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from sklearn.decomposition import PCA, KernelPCA
 from .data import DataSet
 
+
 def plot_confusion_matrix(cm, classes, filename, title='Confusion matrix', cmap=plt.cm.Blues):
     """
     绘制混淆矩阵
@@ -53,9 +54,39 @@ def plot_roc(model, X, y, filename):
     plt.show()
 
 
-def plot_tsne(data: DataSet, filename: str, n: int = 2):
+def plot_tsne(data: DataSet, filename: str, n_iter: int = 1000):
     X = MinMaxScaler().fit_transform(data.features)
-    X_embed = TSNE(n_components=n, n_iter=250, init='random', n_jobs=-1).fit_transform(X)
-    plt.scatter(X_embed[:, 0], X_embed[:, 1], c=data.label, cmap=plt.cm.Spectral)
+    X_embed = TSNE(n_components=3, n_iter=n_iter, init='random', n_jobs=-1).fit_transform(X)
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    ax.scatter(
+        X_embed[:, 0], X_embed[:, 1], X_embed[:, 2],
+        c=data.label,
+        cmap=plt.cm.Spectral
+    )
+
+    plt.legend(loc="best", markerscale=2., numpoints=2, scatterpoints=2, fontsize=12)
+    plt.savefig(filename)
+    plt.show()
+
+
+def plot_tsne_ssl(data: DataSet, filename: str, n_iter: int = 1000):
+    X = MinMaxScaler().fit_transform(data.features)
+    # X = data.features
+    X_embed = TSNE(n_components=3, n_iter=n_iter, init='random', n_jobs=-1).fit_transform(X)
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    color = {-1: 'grey', 0: 'red', 1: 'yellow', 2: 'blue', 3: 'green'}
+    label = {-1: '无标注', 0: '1级困难', 1: '2级困难', 2: '3级困难', 3: '4级困难'}
+    for i in data.strong_label.unique():
+        X_draw = X_embed[data.strong_label[data.strong_label == i].index.tolist()]
+        ax.scatter(
+            X_draw[:, 0], X_draw[:, 1], X_draw[:, 2],
+            color=color[i],
+            alpha=0.2 if i == -1 else 1,
+            label=label[i],
+            s=8 if i == -1 else 18
+        )
+    plt.legend(loc="best")
     plt.savefig(filename)
     plt.show()

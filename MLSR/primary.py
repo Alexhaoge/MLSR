@@ -65,7 +65,8 @@ def grid_search_and_result(
         grid: dict,
         log_dir: str,
         score=None,
-        verbose: int = 2):
+        verbose: int = 2,
+        k: int = 5):
     """
     交叉验证网格搜索，测试集和训练集得分，混淆矩阵和ROC曲线绘制
     Args:
@@ -78,6 +79,7 @@ def grid_search_and_result(
         log_dir:
         score:
         verbose:
+        k:
 
     Returns:
 
@@ -90,7 +92,7 @@ def grid_search_and_result(
         }
     gsCV = GridSearchCV(
         estimator=pipe,
-        cv=5, n_jobs=-1, param_grid=grid,
+        cv=k, n_jobs=-1, param_grid=grid,
         scoring=scoring,
         refit='f1',
         verbose=verbose
@@ -99,7 +101,7 @@ def grid_search_and_result(
     dump(gsCV, log_dir + '/gsCV')
     dump(gsCV.best_estimator_, log_dir + '/best_model')
     file_prefix = log_dir + '/' + strftime("%Y_%m_%d_%H_%M_%S", localtime())
-    file = open(file_prefix + '.log', 'x')
+    file = open(file_prefix + '.log.txt', 'x')
     if verbose > 2:
         file.write(gsCV.cv_results_.__str__())
     if verbose:
@@ -126,13 +128,13 @@ def grid_search_and_result(
 
 def do_decision_tree(dataset: DataSet, log_dir: str = '../log', grid: dict = None):
     """
-
+    训练决策树
     Args:
-        grid:
-        dataset:
-        log_dir:
+        grid:超参数搜索空间的网格，不填则使用默认搜索空间
+        dataset:输入数据集，将会按照0.7, 0.3比例分为训练集和测试集
+        log_dir:输出结果文件的目录
 
-    Returns:
+    Returns:返回训练好的GridSearchCV模型
 
     """
     from sklearn.tree import DecisionTreeClassifier
@@ -156,43 +158,46 @@ def do_decision_tree(dataset: DataSet, log_dir: str = '../log', grid: dict = Non
 
 def do_random_forest(dataset: DataSet, log_dir: str = '../log', grid: dict = None):
     """
-
+    训练随机森林
     Args:
-        grid:
-        dataset:
-        log_dir:
+        grid:超参数搜索空间的网格，不填则使用默认搜索空间
+        dataset:输入数据集，将会按照0.7, 0.3比例分为训练集和测试集
+        log_dir:输出结果文件的目录
 
-    Returns:
+    Returns:返回训练好的GridSearchCV模型
 
     """
-    from sklearn.ensemble import RandomForestRegressor
+    from sklearn.ensemble import RandomForestClassifier
     if grid is None:
         grid = {
             'rf__criterion': ['gini', 'entropy'],
-            'rf__n_estimators': [int(x) for x in np.linspace(start=200, stop=2000, num=10)],  # 这里数字是随机给的，无根据
-            'rf__max_features': ['auto', 'sqrt', 'log2'],
-            'rf__max_depth': [int(x) for x in np.linspace(10, 110, num=11)],  # 这里应该加一个None，但不清楚怎么加；这里数字是随机给的，无根据
-            'rf__min_samples_split': [2, 5, 10],  # 这里数字是随机给的，无根据
-            'rf__min_samples_leaf': [1, 2, 4],  # 这里数字是随机给的，无根据
+            'rf__n_estimators': [100, 300, 600, 800, 1200],
+            'rf__min_samples_split': [2, 5],  # 这里数字是随机给的，无根据
+            'rf__min_samples_leaf': [1, 4],  # 这里数字是随机给的，无根据
             'rf__bootstrap': [True, False],
+            'rf__min_impurity_decrease': [0., 0.01, 0.1],
+            'rf__class_weight': ['balanced', 'balanced_subsample', None],
+            'rf__warm_start': [True, False],
+            'rf__oob_score': [True, False],
+            'rf__ccp_alpha': [0., 0.1, 0.5]
         }
     pipe = Pipeline([
         ('scaler', MinMaxScaler()),
-        ('rf', RandomForestRegressor())
+        ('rf', RandomForestClassifier(max_depth=None, n_jobs=-1))
     ])
     Xtrain, Xtest, ytrain, ytest = train_test_split(dataset.features, dataset.label, train_size=0.7)
     return grid_search_and_result(Xtrain, ytrain, Xtest, ytest, pipe, grid, log_dir)
 
 
-def do_SVM(dataset: DataSet, log_dir: str = '../log', grid: dict = None):
+def do_svm(dataset: DataSet, log_dir: str = '../log', grid: dict = None):
     """
-
+    训练支持向量机
     Args:
-        grid:
-        dataset:
-        log_dir:
+        grid:超参数搜索空间的网格，不填则使用默认搜索空间
+        dataset:输入数据集，将会按照0.7, 0.3比例分为训练集和测试集
+        log_dir:输出结果文件的目录
 
-    Returns:
+    Returns:返回训练好的GridSearchCV模型
 
     """
     from sklearn.svm import SVC
@@ -200,7 +205,7 @@ def do_SVM(dataset: DataSet, log_dir: str = '../log', grid: dict = None):
         grid = {
             'SVM__kernel': ['linear', 'rbf', 'poly', 'sigmoid'],
             'SVM__C': [0.1, 1, 10, 100],  # 这里数字是随机给的，无根据
-            'SVM__gamma': [1,0.1,0.01,0.001],  # 这里数字是随机给的，无根据
+            'SVM__gamma': [1, 0.1, 0.01, 0.001],  # 这里数字是随机给的，无根据
             'SVM__decision_function_shape': ['ovo', 'ovr'],
         }
     pipe = Pipeline([
@@ -211,23 +216,23 @@ def do_SVM(dataset: DataSet, log_dir: str = '../log', grid: dict = None):
     return grid_search_and_result(Xtrain, ytrain, Xtest, ytest, pipe, grid, log_dir)
 
 
-def do_Logistic(dataset: DataSet, log_dir: str = '../log', grid: dict = None):
+def do_logistic(dataset: DataSet, log_dir: str = '../log', grid: dict = None):
     """
-
+    训练逻辑回归
     Args:
-        grid:
-        dataset:
-        log_dir:
+        grid:超参数搜索空间的网格，不填则使用默认搜索空间
+        dataset:输入数据集，将会按照0.7, 0.3比例分为训练集和测试集
+        log_dir:输出结果文件的目录
 
-    Returns:
+    Returns:返回训练好的GridSearchCV模型
 
     """
     from sklearn.linear_model import LogisticRegression
     if grid is None:
         grid = {
-            'Logistic__penalty' : ['l1', 'l2'],
-            'Logistic__C' : np.logspace(-4, 4, 20),  # 这里数字是随机给的，无根据
-            'Logistic__solver' : ['lbfgs', 'liblinear'],
+            'Logistic__penalty': ['l1', 'l2'],
+            'Logistic__C': np.logspace(-4, 4, 20),  # 这里数字是随机给的，无根据
+            'Logistic__solver': ['lbfgs', 'liblinear'],
         }
     pipe = Pipeline([
         ('scaler', MinMaxScaler()),
@@ -237,21 +242,21 @@ def do_Logistic(dataset: DataSet, log_dir: str = '../log', grid: dict = None):
     return grid_search_and_result(Xtrain, ytrain, Xtest, ytest, pipe, grid, log_dir)
 
 
-def do_Naive_Bayes(dataset: DataSet, log_dir: str = '../log', grid: dict = None):
+def do_naive_bayes(dataset: DataSet, log_dir: str = '../log', grid: dict = None):
     """
-
+    训练朴素贝叶斯
     Args:
-        grid:
-        dataset:
-        log_dir:
+        grid:超参数搜索空间的网格，不填则使用默认搜索空间
+        dataset:输入数据集，将会按照0.7, 0.3比例分为训练集和测试集
+        log_dir:输出结果文件的目录
 
-    Returns:
+    Returns:返回训练好的GridSearchCV模型
 
     """
     from sklearn.naive_bayes import MultinomialNB
     if grid is None:
         grid = {
-            'NB__alpha': [1, 0.1, 0.01, 0.001, 0.0001, 0.00001],  # 这里数字是随机给的，无根据
+            'NB__alpha': [1, 0.1, 0.01, 0.001, 0.0001, 0.00001],
         }
     pipe = Pipeline([
         ('scaler', MinMaxScaler()),
