@@ -135,4 +135,5 @@ dmypy.json
 .pyre/
 
 nohup.out
+*.nohup.out
 /.vscode/

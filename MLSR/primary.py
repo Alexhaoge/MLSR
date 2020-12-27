@@ -10,10 +10,10 @@ import pandas as pd
 from time import strftime, localtime
 from .data import DataSet
 from .plot import plot_confusion_matrix
-from os import mkdir
 
 
-def lower_bound(cv_results):
+@DeprecationWarning
+def lower_bound(cv_results: dict):
     """
     Calculate the lower bound within 1 standard deviation
     of the best `mean_test_scores`.
@@ -34,7 +34,8 @@ def lower_bound(cv_results):
             - cv_results['std_test_score'][best_score_idx])
 
 
-def best_low_complexity(cv_results):
+@DeprecationWarning
+def best_low_complexity(cv_results: dict):
     """
     Balance model complexity with cross-validated score.
     Author: Wenhao Zhang <wenhaoz@ucla.edu>
@@ -203,16 +204,25 @@ def do_svm(dataset: DataSet, log_dir: str = '../log', grid: dict = None):
     """
     from sklearn.svm import SVC
     if grid is None:
+        # rough grid
+        # grid = {
+        #     'SVM__kernel': ['linear', 'rbf', 'poly', 'sigmoid'],
+        #     'SVM__C': [0.01, 0.1, 0.5, 1, 5, 10, 100],
+        #     'SVM__gamma': [0.0001, 0.001, 0.01, 'scale', 'auto'],
+        #     'SVM__degree': [3, 5],
+        #     'SVM__decision_function_shape': ['ovo', 'ovr'],
+        #     'SVM__class_weight': [None, 'balanced'],
+        #     'SVM__max_iter': [-1, 300],
+        #     'SVM__break_ties': [True, False],
+        #     'SVM__shrinking': [True, False]
+        # }
+        # fine grid
         grid = {
-            'SVM__kernel': ['linear', 'rbf', 'poly', 'sigmoid'],
-            'SVM__C': [0.01, 0.1, 0.5, 1, 5, 10, 100],
-            'SVM__gamma': [0.0001, 0.001, 0.01, 'scale', 'auto'],
-            'SVM__degree': [3, 5],
+            'SVM__kernel': ['linear', 'rbf', 'poly'],
+            'SVM__C': [0.7, 0.8, 0.9, 0.95, 1, 1.05, 1.1, 1.2, 1.5, 2],
+            'SVM__degree': [2, 3, 4],
             'SVM__decision_function_shape': ['ovo', 'ovr'],
-            'SVM__class_weight': [None, 'balanced'],
-            'SVM__max_iter': [-1, 300],
             'SVM__break_ties': [True, False],
-            'SVM__shrinking': [True, False]
         }
     pipe = Pipeline([
         ('scaler', MinMaxScaler()),
