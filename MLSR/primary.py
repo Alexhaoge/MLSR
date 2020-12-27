@@ -119,7 +119,7 @@ def grid_search_and_result(
         plot_confusion_matrix(cm, ['特别困难', '一般困难', '不困难'], file_prefix + '_test_cm.png')
         file.write('\ntest_cm:\n')
         file.write(cm.__str__())
-#         plot_roc(best_model, Xtest, ytest, file_prefix + '_roc.png')
+    #         plot_roc(best_model, Xtest, ytest, file_prefix + '_roc.png')
     file.close()
     return gsCV
 
@@ -149,6 +149,36 @@ def do_decision_tree(dataset: DataSet, log_dir: str = '../log', grid: dict = Non
     pipe = Pipeline([
         ('scaler', MinMaxScaler()),
         ('dt', DecisionTreeClassifier())
+    ])
+    Xtrain, Xtest, ytrain, ytest = train_test_split(dataset.features, dataset.label, train_size=0.7)
+    return grid_search_and_result(Xtrain, ytrain, Xtest, ytest, pipe, grid, log_dir)
+
+
+def do_random_forest(dataset: DataSet, log_dir: str = '../log', grid: dict = None):
+    """
+
+    Args:
+        grid:
+        dataset:
+        log_dir:
+
+    Returns:
+
+    """
+    from sklearn.ensemble import RandomForestRegressor
+    if grid is None:
+        grid = {
+            'rf__criterion': ['gini', 'entropy'],
+            'rf__n_estimators': [int(x) for x in np.linspace(start=200, stop=2000, num=10)],  # 这里数字是随机给的，无根据
+            'rf__max_features': ['auto', 'sqrt', 'log2'],
+            'rf__max_depth': [int(x) for x in np.linspace(10, 110, num=11)],  # 这里应该加一个None，但不清楚怎么加；这里数字是随机给的，无根据
+            'rf__min_samples_split': [2, 5, 10],  # 这里数字是随机给的，无根据
+            'rf__min_samples_leaf': [1, 2, 4],  # 这里数字是随机给的，无根据
+            'rf__bootstrap': [True, False],
+        }
+    pipe = Pipeline([
+        ('scaler', MinMaxScaler()),
+        ('rf', RandomForestRegressor())
     ])
     Xtrain, Xtest, ytrain, ytest = train_test_split(dataset.features, dataset.label, train_size=0.7)
     return grid_search_and_result(Xtrain, ytrain, Xtest, ytest, pipe, grid, log_dir)
