@@ -271,9 +271,9 @@ def do_logistic(dataset: DataSet, log_dir: str = '../log', grid: dict = None):
             'Logistic__solver': ['lbfgs', 'liblinear', 'newton-cg', 'sag', 'saga'],
             'Logistic__fit_intercept': [True, False],
             'Logistic__dual': [True, False],
-            'l1_ratio': [True, False],
-            'warm_start': [True, False],
-            'intercept_scaling': [0.01, 0.1, 0.5, 1, 2, 5, 10]
+            'Logistic__l1_ratio': [True, False],
+            'Logistic__warm_start': [True, False],
+            'Logistic__intercept_scaling': [0.01, 0.1, 0.5, 1, 2, 5, 10]
         }
     pipe = Pipeline([
         ('scaler', MinMaxScaler()),
@@ -336,8 +336,8 @@ def do_xgb(dataset: DataSet, log_dir: str = '../log', grid: dict = None):
                 objective='multi：softmax',
                 n_jobs=-1,
                 booster='gbtree',
-                verbosity = 2,
-                verbose = True
+                verbosity=2,
+                verbose=True
             )
         )
     ])
@@ -345,7 +345,6 @@ def do_xgb(dataset: DataSet, log_dir: str = '../log', grid: dict = None):
     gscv = grid_search_and_result(Xtrain, ytrain, Xtest, ytest, pipe, grid, log_dir)
     best_model = gscv.best_estimator_
     file = open(log_dir + '/feature.txt', 'a')
-    XGBClassifier.coef_
     file.write('\nfeature importance\n')
     file.write(best_model['xgb'].feature_importances_.__str__())
     file.close()

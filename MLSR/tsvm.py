@@ -69,7 +69,7 @@ class TSVM(BaseEstimator, ClassifierMixin):
         X1 = X[y > -1, :]
         X2 = X[y == -1, :]
         Y1 = y[y > -1, :]
-        Y1 = y * 2 - 1
+        # Y1 = Y1 * 2 - 1
         N = len(X1) + len(X2)
         sample_weight = ones(N)
         sample_weight[len(X1):] = self.Cu

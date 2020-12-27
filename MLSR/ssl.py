@@ -6,17 +6,16 @@ from sklearn.metrics import f1_score, accuracy_score
 from sklearn.metrics import confusion_matrix
 from joblib import dump, load
 import numpy as np
-import pandas as pd
 from time import strftime, localtime
 from .data import DataSet
 from .plot import plot_confusion_matrix
 
 
 def grid_search_and_result_ssl(
-        Xtrain: pd.DataFrame,
-        ytrain: pd.Series,
-        Xtest: pd.DataFrame,
-        ytest: pd.Series,
+        Xtrain: np.ndarray,
+        ytrain: np.ndarray,
+        Xtest: np.ndarray,
+        ytest: np.ndarray,
         pipe: Pipeline,
         grid: dict,
         log_dir: str,
@@ -82,12 +81,12 @@ def grid_search_and_result_ssl(
     return gsCV
 
 
-def do_naive_bayes(dataset: DataSet, log_dir: str = '../log', grid: dict = None):
+def do_tsvm(data: DataSet, log_dir: str = '../log', grid: dict = None):
     """
     TSVM
     Args:
+        data: 输入数据DataSet对象
         grid:超参数搜索空间的网格，不填则使用默认搜索空间
-        dataset:输入数据集，将会按照0.7, 0.3比例分为训练集和测试集
         log_dir:输出结果文件的目录
 
     Returns:返回训练好的GridSearchCV模型
@@ -96,11 +95,19 @@ def do_naive_bayes(dataset: DataSet, log_dir: str = '../log', grid: dict = None)
     from .tsvm import TSVM
     if grid is None:
         grid = {
-            'tsvm__'
+            'tsvm__kernel': ['linear']
         }
     pipe = Pipeline([
         ('scaler', MinMaxScaler()),
         ('tsvm', TSVM())
     ])
-    Xtrain, Xtest, ytrain, ytest = train_test_split(dataset.features, dataset.label, train_size=0.7)
+    index = data.strong_label[data.strong_label != -1]
+    strong_features = data.features.take(index)
+    strong_label = data.strong_label.take(index)
+    index = data.strong_label[data.strong_label == -1]
+    unlabeled_features = data.features.take(index)
+    unlabeled_strong_label = data.strong_label.take(index)
+    Xtrain, Xtest, ytrain, ytest = train_test_split(strong_features, strong_label, train_size=0.4)
+    Xtrain = np.concatenate((Xtrain, unlabeled_features.values), axis=0)
+    ytrain = np.concatenate((ytrain, unlabeled_strong_label.values), axis=0)
     return grid_search_and_result_ssl(Xtrain, ytrain, Xtest, ytest, pipe, grid, log_dir)

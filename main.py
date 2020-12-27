@@ -1,5 +1,6 @@
 from MLSR.data import DataSet
 from MLSR.primary import *
+from MLSR.ssl import *
 import argparse as arg
 
 
@@ -14,6 +15,7 @@ def get_arguments():
     parser.add_argument('--svm', action='store_true', help='Train svm')
     parser.add_argument('--lr', action='store_true', help='Train logistic regression')
     parser.add_argument('--xgb', action='store_true', help='Train xgboost')
+    parser.add_argument('--tsvm', action='store_true', help='Train tsvm')
     return parser.parse_args()
 
 
@@ -43,3 +45,6 @@ if __name__ == '__main__':
     hard, soso = zz.split_by_weak_label()
     hard.strong_label = hard.strong_label.map({0: 0, 1: 1})
     soso.strong_label = soso.strong_label.map({2: 0, 3: 1})
+    if args.tsvm:
+        do_tsvm(hard, 'log/tsvm/hard')
+        do_tsvm(soso, 'log/tsvm/soso')
