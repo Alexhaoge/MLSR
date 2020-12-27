@@ -13,7 +13,7 @@ class TSVM(BaseEstimator, ClassifierMixin):
     代码修改自https://github.com/horcham/TSVM
     """
 
-    def __init__(self, Cl: int = 1, Cu: float = 0.001,  kernel: str = 'linear'):
+    def __init__(self, Cl: int = 1, Cu: float = 0.001,  kernel: str = 'linear', clf: SVC = None):
         """
         Initial TSVM
         Args:
@@ -24,7 +24,7 @@ class TSVM(BaseEstimator, ClassifierMixin):
         self.Cl = Cl
         self.Cu = Cu
         self.kernel = kernel
-        self.clf = SVC(C=1.5, kernel=self.kernel)
+        self.clf = clf
 
     def get_params(self, deep=True):
         """
@@ -65,11 +65,12 @@ class TSVM(BaseEstimator, ClassifierMixin):
             y: labels of input
                 np.array, shape:[n, ], n: numbers of samples with labels, -1 for unlabeled
         """
-        # self.clf = SVC(C=1.5, kernel=self.kernel)
+        if self.clf is None:
+            self.clf = SVC(C=1.5, kernel=self.kernel)
         X1 = X[y > -1, :]
         X2 = X[y == -1, :]
-        Y1 = y[y > -1, :]
-        # Y1 = Y1 * 2 - 1
+        Y1 = y[y > -1]
+        Y1 = Y1 * 2 - 1
         N = len(X1) + len(X2)
         sample_weight = ones(N)
         sample_weight[len(X1):] = self.Cu
@@ -116,7 +117,7 @@ class TSVM(BaseEstimator, ClassifierMixin):
         Accuracy of TSVM
                 float
         """
-        return self.clf.score(X, Y, sample_weight=sample_weight)
+        return self.clf.score(X, (Y * 2 - 1), sample_weight=sample_weight)
 
     def predict(self, X):
         """
@@ -131,7 +132,7 @@ class TSVM(BaseEstimator, ClassifierMixin):
         labels of X
                 np.array, shape:[n, ], n: numbers of samples
         """
-        return self.clf.predict(X)
+        return (self.clf.predict(X) + 1) / 2
 
     def save(self, path):
         """

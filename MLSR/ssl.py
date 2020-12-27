@@ -101,10 +101,10 @@ def do_tsvm(data: DataSet, log_dir: str = '../log', grid: dict = None):
         ('scaler', MinMaxScaler()),
         ('tsvm', TSVM())
     ])
-    index = data.strong_label[data.strong_label != -1]
+    index = data.strong_label[data.strong_label != -1].index
     strong_features = data.features.take(index)
     strong_label = data.strong_label.take(index)
-    index = data.strong_label[data.strong_label == -1]
+    index = data.strong_label[data.strong_label == -1].index
     unlabeled_features = data.features.take(index)
     unlabeled_strong_label = data.strong_label.take(index)
     Xtrain, Xtest, ytrain, ytest = train_test_split(strong_features, strong_label, train_size=0.4)

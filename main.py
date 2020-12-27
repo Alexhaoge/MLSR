@@ -42,9 +42,9 @@ if __name__ == '__main__':
         do_logistic(zz, 'log/lr')
     if args.xgb:
         do_xgb(zz, 'log/xgb')
-    hard, soso = zz.split_by_weak_label()
-    hard.strong_label = hard.strong_label.map({0: 0, 1: 1})
-    soso.strong_label = soso.strong_label.map({2: 0, 3: 1})
+    hard, soso = z.split_by_weak_label()
+    hard.strong_label = hard.strong_label.map({-1: -1, 0: 0, 1: 1})
+    soso.strong_label = soso.strong_label.map({-1: -1, 2: 0, 3: 1})
     if args.tsvm:
         do_tsvm(hard, 'log/tsvm/hard')
         do_tsvm(soso, 'log/tsvm/soso')
