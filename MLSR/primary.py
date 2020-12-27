@@ -200,7 +200,7 @@ def do_SVM(dataset: DataSet, log_dir: str = '../log', grid: dict = None):
         grid = {
             'SVM__kernel': ['linear', 'rbf', 'poly', 'sigmoid'],
             'SVM__C': [0.1, 1, 10, 100],  # 这里数字是随机给的，无根据
-            'SVM__gamma': [1,0.1,0.01,0.001],
+            'SVM__gamma': [1,0.1,0.01,0.001],  # 这里数字是随机给的，无根据
             'SVM__decision_function_shape': ['ovo', 'ovr'],
         }
     pipe = Pipeline([
