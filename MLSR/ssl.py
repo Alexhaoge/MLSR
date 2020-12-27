@@ -69,11 +69,11 @@ def grid_search_and_result_ssl(
     file.write('F1-score on test set: {}\n'.format(f1_score(ytest, test_prediction, average='macro')))
     if verbose:
         cm = confusion_matrix(ytrain, best_model.predict(Xtrain))
-        plot_confusion_matrix(cm, ['1级', '2级困难', '3级', '4级'], file_prefix + '_train_cm.png')
+        plot_confusion_matrix(cm, ['无标签', '0', '1'], file_prefix + '_train_cm.png')
         file.write('\ntrain_cm:\n')
         file.write(cm.__str__())
         cm = confusion_matrix(ytest, test_prediction)
-        plot_confusion_matrix(cm, ['1级', '2级困难', '3级', '4级'], file_prefix + '_test_cm.png')
+        plot_confusion_matrix(cm, ['无标签', '0', '1'], file_prefix + '_test_cm.png')
         file.write('\ntest_cm:\n')
         file.write(cm.__str__())
     #         plot_roc(best_model, Xtest, ytest, file_prefix + '_roc.png')
@@ -95,7 +95,9 @@ def do_tsvm(data: DataSet, log_dir: str = '../log', grid: dict = None):
     from .tsvm import TSVM
     if grid is None:
         grid = {
-            'tsvm__kernel': ['linear']
+            'tsvm__kernel': ['linear', 'poly', 'rbf', 'sigmoid'],
+            'n_iter': [10, 50],
+            'Cu': [0.0001, 0.001, 0.01]
         }
     pipe = Pipeline([
         ('scaler', MinMaxScaler()),

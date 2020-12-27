@@ -13,7 +13,7 @@ class TSVM(BaseEstimator, ClassifierMixin):
     代码修改自https://github.com/horcham/TSVM
     """
 
-    def __init__(self, Cl: int = 1, Cu: float = 0.001,  kernel: str = 'linear', clf: SVC = None):
+    def __init__(self, Cl: int = 1, Cu: float = 0.001,  kernel: str = 'linear', clf: SVC = None, n_iter: int = 10):
         """
         Initial TSVM
         Args:
@@ -25,6 +25,7 @@ class TSVM(BaseEstimator, ClassifierMixin):
         self.Cu = Cu
         self.kernel = kernel
         self.clf = clf
+        self.n_iter = n_iter
 
     def get_params(self, deep=True):
         """
@@ -34,7 +35,8 @@ class TSVM(BaseEstimator, ClassifierMixin):
             'Cl': self.Cl, 
             'Cu': self.Cu,
             'kernel': self.kernel,
-            'clf': self.clf
+            'clf': self.clf,
+            'n_iter': self.n_iter
         }
 
     def set_params(self, **parameters):
@@ -81,9 +83,11 @@ class TSVM(BaseEstimator, ClassifierMixin):
         X3 = vstack([X1, X2])
         Y3 = hstack([Y1, Y2])
 
-        while self.Cu < self.Cl:
+        while self.Cu + 1e-5 < self.Cl:
             self.clf.fit(X3, Y3, sample_weight=sample_weight)
+            i = 0
             while True:
+                print(i)
                 Y2_d = self.clf.decision_function(X2)    # linear: w^Tx + b
                 epsilon = 1 - Y2 * Y2_d   # calculate function margin
                 positive_set, positive_id = epsilon[Y2 > 0], X2_id[Y2 > 0]
@@ -91,7 +95,8 @@ class TSVM(BaseEstimator, ClassifierMixin):
                 positive_max_id = positive_id[argmax(positive_set)]
                 negative_max_id = negative_id[argmax(negative_set)]
                 a, b = epsilon[positive_max_id], epsilon[negative_max_id]
-                if a > 0 and b > 0 and a + b > 2.0:
+                i += 1
+                if a > 0 and b > 0 and a + b > 2.0 and i <= self.n_iter:
                     Y2[positive_max_id] = Y2[positive_max_id] * -1
                     Y2[negative_max_id] = Y2[negative_max_id] * -1
                     Y3 = hstack([Y1, Y2])
