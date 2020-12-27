@@ -71,18 +71,18 @@ def grid_search_and_result(
     """
     交叉验证网格搜索，测试集和训练集得分，混淆矩阵和ROC曲线绘制
     Args:
-        Xtrain:
-        ytrain:
-        Xtest:
-        ytest:
-        pipe:
-        grid:
-        log_dir:
-        score:
-        verbose:
-        k:
+        Xtrain: 训练集特征
+        ytrain: 训练集标签
+        Xtest: 测试集特征
+        ytest: 测试集标签
+        pipe: 模型管道
+        grid: 超参数搜索空间
+        log_dir: 训练结果输出目录，注意一定要先创建该目录
+        score: 评分指标，默认使用f1和acc，最后用f1 refit
+        verbose: 日志级别，0为静默
+        k: 交叉验证折数
 
-    Returns:
+    Returns: 训练好的GridSearchCV模型
 
     """
     file_prefix = log_dir + '/' + strftime("%Y_%m_%d_%H_%M_%S", localtime())
