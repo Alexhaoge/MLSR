@@ -209,3 +209,53 @@ def do_SVM(dataset: DataSet, log_dir: str = '../log', grid: dict = None):
     ])
     Xtrain, Xtest, ytrain, ytest = train_test_split(dataset.features, dataset.label, train_size=0.7)
     return grid_search_and_result(Xtrain, ytrain, Xtest, ytest, pipe, grid, log_dir)
+
+
+def do_Logistic(dataset: DataSet, log_dir: str = '../log', grid: dict = None):
+    """
+
+    Args:
+        grid:
+        dataset:
+        log_dir:
+
+    Returns:
+
+    """
+    from sklearn.linear_model import LogisticRegression
+    if grid is None:
+        grid = {
+            'Logistic__penalty' : ['l1', 'l2'],
+            'Logistic__C' : np.logspace(-4, 4, 20),  # 这里数字是随机给的，无根据
+            'Logistic__solver' : ['lbfgs', 'liblinear'],
+        }
+    pipe = Pipeline([
+        ('scaler', MinMaxScaler()),
+        ('Logistic', LogisticRegression())
+    ])
+    Xtrain, Xtest, ytrain, ytest = train_test_split(dataset.features, dataset.label, train_size=0.7)
+    return grid_search_and_result(Xtrain, ytrain, Xtest, ytest, pipe, grid, log_dir)
+
+
+def do_Naive_Bayes(dataset: DataSet, log_dir: str = '../log', grid: dict = None):
+    """
+
+    Args:
+        grid:
+        dataset:
+        log_dir:
+
+    Returns:
+
+    """
+    from sklearn.naive_bayes import MultinomialNB
+    if grid is None:
+        grid = {
+            'NB__alpha': [1, 0.1, 0.01, 0.001, 0.0001, 0.00001],  # 这里数字是随机给的，无根据
+        }
+    pipe = Pipeline([
+        ('scaler', MinMaxScaler()),
+        ('NB', MultinomialNB())
+    ])
+    Xtrain, Xtest, ytrain, ytest = train_test_split(dataset.features, dataset.label, train_size=0.7)
+    return grid_search_and_result(Xtrain, ytrain, Xtest, ytest, pipe, grid, log_dir)
