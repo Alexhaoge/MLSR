@@ -37,6 +37,9 @@ if __name__ == '__main__':
     if args.svm:
         do_svm(zz, 'log/svm')
     if args.lr:
-        do_svm(zz, 'log/lr')
+        do_logistic(zz, 'log/lr')
     if args.xgb:
         do_xgb(zz, 'log/xgb')
+    hard, soso = zz.split_by_weak_label()
+    hard.strong_label = hard.strong_label.map({0: 0, 1: 1})
+    soso.strong_label = soso.strong_label.map({2: 0, 3: 1})

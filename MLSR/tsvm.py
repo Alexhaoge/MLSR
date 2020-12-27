@@ -46,14 +46,13 @@ class TSVM(BaseEstimator, ClassifierMixin):
         return self
 
     def load(self, model_path):
-        '''
+        """
         Load TSVM from model_path
 
-        Parameters
-        ----------
-        model_path: model path of TSVM
+        Args:
+            model_path: model path of TSVM
                         model should be svm in sklearn and saved by sklearn.externals.joblib
-        '''
+        """
         self.clf = load(model_path)
 
     def fit(self, X: ndarray, y: ndarray):
@@ -66,10 +65,11 @@ class TSVM(BaseEstimator, ClassifierMixin):
             y: labels of input
                 np.array, shape:[n, ], n: numbers of samples with labels, -1 for unlabeled
         """
-        self.clf = SVC(C=1.5, kernel=self.kernel)
+        # self.clf = SVC(C=1.5, kernel=self.kernel)
         X1 = X[y > -1, :]
         X2 = X[y == -1, :]
         Y1 = y[y > -1, :]
+        Y1 = y * 2 - 1
         N = len(X1) + len(X2)
         sample_weight = ones(N)
         sample_weight[len(X1):] = self.Cu
@@ -100,49 +100,47 @@ class TSVM(BaseEstimator, ClassifierMixin):
             self.Cu = min(2*self.Cu, self.Cl)
             sample_weight[len(X1):] = self.Cu
 
-    def score(self, X: ndarray, Y: ndarray):
-        '''
+    def score(self, X: ndarray, Y: ndarray, sample_weight=None):
+        """
         Calculate accuracy of TSVM by X, Y
 
-        Parameters
-        ----------
-        X: Input data
+        Args:
+            X: Input data
                 np.array, shape:[n, m], n: numbers of samples, m: numbers of features
-        Y: labels of X
+            Y: labels of X
                 np.array, shape:[n, ], n: numbers of samples
+            sample_weight:
 
         Returns
         -------
         Accuracy of TSVM
                 float
-        '''
-        return self.clf.score(X, Y)
+        """
+        return self.clf.score(X, Y, sample_weight=sample_weight)
 
     def predict(self, X):
-        '''
+        """
         Feed X and predict Y by TSVM
 
-        Parameters
-        ----------
-        X: Input data
+        Args:
+            X: Input data
                 np.array, shape:[n, m], n: numbers of samples, m: numbers of features
 
         Returns
         -------
         labels of X
                 np.array, shape:[n, ], n: numbers of samples
-        '''
+        """
         return self.clf.predict(X)
 
     def save(self, path):
-        '''
+        """
         Save TSVM to model_path
 
-        Parameters
-        ----------
-        model_path: model path of TSVM
+        Args:
+            model_path: model path of TSVM
                         model should be svm in sklearn
-        '''
+        """
         dump(self.clf, path)
 
 

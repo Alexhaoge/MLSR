@@ -84,7 +84,7 @@ def grid_search_and_result_ssl(
 
 def do_naive_bayes(dataset: DataSet, log_dir: str = '../log', grid: dict = None):
     """
-    pass, wrong funcion
+    TSVM
     Args:
         grid:超参数搜索空间的网格，不填则使用默认搜索空间
         dataset:输入数据集，将会按照0.7, 0.3比例分为训练集和测试集
@@ -93,14 +93,14 @@ def do_naive_bayes(dataset: DataSet, log_dir: str = '../log', grid: dict = None)
     Returns:返回训练好的GridSearchCV模型
 
     """
-    from sklearn.naive_bayes import GaussianNB
+    from .tsvm import TSVM
     if grid is None:
         grid = {
-            'NB__var_smoothing': [1e-10, 1e-9, 1e-8, 1e-6, 1e-4, 1e-2, 1],
+            'tsvm__'
         }
     pipe = Pipeline([
         ('scaler', MinMaxScaler()),
-        ('NB', GaussianNB())
+        ('tsvm', TSVM())
     ])
     Xtrain, Xtest, ytrain, ytest = train_test_split(dataset.features, dataset.label, train_size=0.7)
     return grid_search_and_result_ssl(Xtrain, ytrain, Xtest, ytest, pipe, grid, log_dir)
