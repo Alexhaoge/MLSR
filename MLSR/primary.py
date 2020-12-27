@@ -3,13 +3,13 @@ from sklearn.model_selection import GridSearchCV, train_test_split
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.pipeline import Pipeline
 from sklearn.metrics import f1_score, accuracy_score
-from sklearn.metrics import confusion_matrix, plot_roc_curve, plot_det_curve, plot_precision_recall_curve
+from sklearn.metrics import confusion_matrix
 from joblib import dump, load
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 from time import strftime, localtime
 from .data import DataSet
+from .plot import plot_confusion_matrix
 
 
 def lower_bound(cv_results):
@@ -54,34 +54,6 @@ def best_low_complexity(cv_results):
         cv_results['param_reduce_dim__n_components'][candidate_idx].argmin()
     ]
     return best_idx
-
-
-def plot_confusion_matrix(cm, classes, filename, title='Confusion matrix', cmap=plt.cm.Blues):
-    import itertools
-    plt.imshow(cm, interpolation='nearest', cmap=cmap)
-    plt.title(title)
-    plt.colorbar()
-    tick_marks = np.arange(len(classes))
-    plt.xticks(tick_marks, classes, rotation=45)
-    plt.yticks(tick_marks, classes)
-    thresh = cm.max() / 2.
-    for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
-        plt.text(j, i, format(cm[i, j], 'd'),
-                 horizontalalignment="center",
-                 color="white" if cm[i, j] > thresh else "black")
-    plt.tight_layout()
-    plt.ylabel('True label')
-    plt.xlabel('Predicted label')
-    plt.savefig(filename)
-    plt.show()
-
-
-def plot_roc(model, X, y, filename):
-    ax = plt.gca()
-    dis = plot_det_curve(model, X, y, ax=ax)
-    dis.plot(ax=ax, alpha=0.8)
-    plt.savefig(filename)
-    plt.show()
 
 
 def grid_search_and_result(
