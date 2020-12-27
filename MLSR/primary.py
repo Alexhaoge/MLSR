@@ -85,8 +85,6 @@ def grid_search_and_result(
     Returns: 训练好的GridSearchCV模型
 
     """
-    file_prefix = log_dir + '/' + strftime("%Y_%m_%d_%H_%M_%S", localtime())
-    file = open(file_prefix + '.log.txt', 'x')
     scoring = score
     if scoring is None:
         scoring = {
@@ -103,6 +101,8 @@ def grid_search_and_result(
     gsCV.fit(Xtrain, ytrain)
     dump(gsCV, log_dir + '/gsCV')
     dump(gsCV.best_estimator_, log_dir + '/best_model')
+    file_prefix = log_dir + '/' + strftime("%Y_%m_%d_%H_%M_%S", localtime())
+    file = open(file_prefix + '.log.txt', 'x')
     if verbose > 2:
         file.write(gsCV.cv_results_.__str__())
     if verbose:
