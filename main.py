@@ -13,6 +13,7 @@ def get_arguments():
     parser.add_argument('--nb', action='store_true', help='Train naive bayes')
     parser.add_argument('--svm', action='store_true', help='Train svm')
     parser.add_argument('--lr', action='store_true', help='Train logistic regression')
+    parser.add_argument('--xgb', action='store_true', help='Train xgboost')
     return parser.parse_args()
 
 
@@ -37,3 +38,5 @@ if __name__ == '__main__':
         do_svm(zz, 'log/svm')
     if args.lr:
         do_svm(zz, 'log/lr')
+    if args.xgb:
+        do_xgb(zz, 'log/xgb')
