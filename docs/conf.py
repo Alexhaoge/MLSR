@@ -88,5 +88,5 @@ source_suffix = {
 
 autodoc_mock_imports = [
     'pandas', 'numpy', 'scikit-learn', 'matplotlib', 'joblib',
-    'jieba', 'scipy', 'sklearn'
+    'jieba', 'scipy', 'sklearn', 'xgboost'
 ]

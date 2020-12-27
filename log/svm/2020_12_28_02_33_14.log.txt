@@ -1,0 +1,13 @@
+{'cv': 5, 'error_score': nan, 'estimator__memory': None, 'estimator__steps': [('scaler', MinMaxScaler()), ('SVM', SVC(cache_size=500))], 'estimator__verbose': False, 'estimator__scaler': MinMaxScaler(), 'estimator__SVM': SVC(cache_size=500), 'estimator__scaler__clip': False, 'estimator__scaler__copy': True, 'estimator__scaler__feature_range': (0, 1), 'estimator__SVM__C': 1.0, 'estimator__SVM__break_ties': False, 'estimator__SVM__cache_size': 500, 'estimator__SVM__class_weight': None, 'estimator__SVM__coef0': 0.0, 'estimator__SVM__decision_function_shape': 'ovr', 'estimator__SVM__degree': 3, 'estimator__SVM__gamma': 'scale', 'estimator__SVM__kernel': 'rbf', 'estimator__SVM__max_iter': -1, 'estimator__SVM__probability': False, 'estimator__SVM__random_state': None, 'estimator__SVM__shrinking': True, 'estimator__SVM__tol': 0.001, 'estimator__SVM__verbose': False, 'estimator': Pipeline(steps=[('scaler', MinMaxScaler()), ('SVM', SVC(cache_size=500))]), 'n_jobs': -1, 'param_grid': {'SVM__kernel': ['linear', 'rbf', 'poly'], 'SVM__C': [0.7, 0.8, 0.9, 0.95, 1, 1.05, 1.1, 1.2, 1.5, 2], 'SVM__degree': [2, 3, 4], 'SVM__gamma': [0.001, 'scale'], 'SVM__decision_function_shape': ['ovo', 'ovr'], 'SVM__break_ties': [True, False], 'SVM__tol': [0.01, 0.001, 0.0001, 1e-05]}, 'pre_dispatch': '2*n_jobs', 'refit': 'f1', 'return_train_score': False, 'scoring': {'f1': 'f1_macro', 'accuracy': 'accuracy'}, 'verbose': 2}
+Best score on training set by grid search cross validation: 0.7896055739901575
+Accuracy on test set: 0.7015725518227305
+F1-score on test set: 0.7634180954543092
+
+train_cm:
+[[1786 1020   13]
+ [ 702 2315   11]
+ [   1   16  664]]
+test_cm:
+[[743 484   4]
+ [323 910  15]
+ [  0   9 310]]

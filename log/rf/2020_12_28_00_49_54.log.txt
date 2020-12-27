@@ -1,0 +1,59 @@
+{
+'cv': 5, 'error_score': nan, 'estimator__memory': None,
+'estimator__steps': [('scaler', MinMaxScaler()), ('rf', RandomForestClassifier(n_jobs=-1))], 
+'estimator__verbose': False, 
+'estimator__scaler': MinMaxScaler(), 
+'estimator__rf': RandomForestClassifier(n_jobs=-1), 
+'estimator__scaler__clip': False, 
+'estimator__scaler__copy': True, 
+'estimator__scaler__feature_range': (0, 1), 
+'estimator__rf__bootstrap': True, 
+'estimator__rf__ccp_alpha': 0.0, 
+'estimator__rf__class_weight': None, 
+'estimator__rf__criterion': 'gini', 
+'estimator__rf__max_depth': None, 
+'estimator__rf__max_features': 'auto', 
+'estimator__rf__max_leaf_nodes': None, 
+'estimator__rf__max_samples': None, 
+'estimator__rf__min_impurity_decrease': 0.0, 
+'estimator__rf__min_impurity_split': None, 
+'estimator__rf__min_samples_leaf': 1, 
+'estimator__rf__min_samples_split': 2, 
+'estimator__rf__min_weight_fraction_leaf': 0.0, 
+'estimator__rf__n_estimators': 100, 
+'estimator__rf__n_jobs': -1, 
+'estimator__rf__oob_score': False, 
+'estimator__rf__random_state': None,
+'estimator__rf__verbose': 0, 
+'estimator__rf__warm_start': False, 
+'estimator': Pipeline(steps=[('scaler', MinMaxScaler()),('rf', RandomForestClassifier(n_jobs=-1))]), 
+'n_jobs': -1, 
+'param_grid': {
+'rf__criterion': ['gini', 'entropy'], 
+'rf__n_estimators': [100, 300, 600, 800, 1200], 
+'rf__min_samples_split': [2, 5], 
+'rf__min_samples_leaf': [1, 4], 
+'rf__bootstrap': [True, False], 
+'rf__min_impurity_decrease': [0.0, 0.01, 0.1], 
+'rf__class_weight': ['balanced', 'balanced_subsample', None], 
+'rf__warm_start': [True, False], 
+'rf__oob_score': [True, False], 
+'rf__ccp_alpha': [0.0, 0.1, 0.5]}, 
+'pre_dispatch': '2*n_jobs', 
+'refit': 'f1', 
+'return_train_score': False, 
+'scoring': {'f1': 'f1_macro', 'accuracy': 'accuracy'},
+'verbose': 2
+}
+Best score on training set by grid search cross validation: 0.8522752500995501
+Accuracy on test set: 0.7226590421729807
+F1-score on test set: 0.7872894272420985
+
+train_cm:
+[[2113  717    9]
+ [ 485 2478   21]
+ [   0    2  703]]
+test_cm:
+[[759 448   4]
+ [318 969   5]
+ [  0   1 294]]
