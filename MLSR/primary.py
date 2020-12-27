@@ -182,3 +182,30 @@ def do_random_forest(dataset: DataSet, log_dir: str = '../log', grid: dict = Non
     ])
     Xtrain, Xtest, ytrain, ytest = train_test_split(dataset.features, dataset.label, train_size=0.7)
     return grid_search_and_result(Xtrain, ytrain, Xtest, ytest, pipe, grid, log_dir)
+
+
+def do_SVM(dataset: DataSet, log_dir: str = '../log', grid: dict = None):
+    """
+
+    Args:
+        grid:
+        dataset:
+        log_dir:
+
+    Returns:
+
+    """
+    from sklearn.svm import SVC
+    if grid is None:
+        grid = {
+            'SVM__kernel': ['linear', 'rbf', 'poly', 'sigmoid'],
+            'SVM__C': [0.1, 1, 10, 100],  # 这里数字是随机给的，无根据
+            'SVM__gamma': [1,0.1,0.01,0.001],
+            'SVM__decision_function_shape': ['ovo', 'ovr'],
+        }
+    pipe = Pipeline([
+        ('scaler', MinMaxScaler()),
+        ('SVM', SVC())
+    ])
+    Xtrain, Xtest, ytrain, ytest = train_test_split(dataset.features, dataset.label, train_size=0.7)
+    return grid_search_and_result(Xtrain, ytrain, Xtest, ytest, pipe, grid, log_dir)
