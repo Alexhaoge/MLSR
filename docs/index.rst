@@ -16,7 +16,10 @@ Maching Learning Scholarship Rater(MLSR)
 
 文档
 ====
-
+.. toctree::
+   :maxdepth: 2
+   
+   api/modules
 
 索引
 ==================

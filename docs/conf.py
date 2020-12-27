@@ -10,6 +10,15 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
+
+# ----------
+# Sphinx autodoc 出现“
+# WARNING: autodoc: failed to import module 'plot' from module 'MLSR'; 
+# the following exception was raised:numpy.core.multiarray failed to import
+# ”处理办法
+# https://stackoverflow.com/questions/63036069/sphinx-and-autodoc-numpy-core-multiarray-failed-to-import-mock-has-unsupporte
+# ----------
+
 import os
 import sys
 import sphinx_rtd_theme
@@ -35,8 +44,12 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.napoleon',
     'sphinx.ext.mathjax',
-    'sphinx.ext.viewcode'
+    'sphinx.ext.viewcode',
+    'sphinx.ext.autosummary',
+    'sphinx.ext.coverage' 
 ]
+
+todo_include_todos = True
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -73,4 +86,7 @@ source_suffix = {
     '.md': 'markdown',
 }
 
-autodoc_mock_imports = ['pandas', 'numpy', 'scikit-learn']
+autodoc_mock_imports = [
+    'pandas', 'numpy', 'scikit-learn', 'matplotlib', 'joblib',
+    'jieba', 'scipy', 'sklearn'
+]

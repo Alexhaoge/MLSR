@@ -82,39 +82,9 @@ def grid_search_and_result_ssl(
     return gsCV
 
 
-def do_decision_tree(dataset: DataSet, log_dir: str = '../log', grid: dict = None):
-    """
-    训练决策树
-    Args:
-        grid:超参数搜索空间的网格，不填则使用默认搜索空间
-        dataset:输入数据集，将会按照0.7, 0.3比例分为训练集和测试集
-        log_dir:输出结果文件的目录
-
-    Returns:返回训练好的GridSearchCV模型
-
-    """
-    from sklearn.tree import DecisionTreeClassifier
-    if grid is None:
-        grid = {
-            'dt__criterion': ['gini', 'entropy'],
-            'dt__max_features': ['auto', 'sqrt', 'log2'],
-            'dt__class_weight': [None, 'balanced'],
-            'dt__ccp_alpha': [0.0, 0.1],
-            'dt__min_impurity_decrease': [0., 0.01],
-            'dt__min_samples_leaf': [1, 5],
-            'dt__min_samples_split': [2, 8],
-        }
-    pipe = Pipeline([
-        ('scaler', MinMaxScaler()),
-        ('dt', DecisionTreeClassifier())
-    ])
-    Xtrain, Xtest, ytrain, ytest = train_test_split(dataset.features, dataset.label, train_size=0.7)
-    return grid_search_and_result(Xtrain, ytrain, Xtest, ytest, pipe, grid, log_dir)
-
-
 def do_naive_bayes(dataset: DataSet, log_dir: str = '../log', grid: dict = None):
     """
-    训练朴素贝叶斯
+    pass, wrong funcion
     Args:
         grid:超参数搜索空间的网格，不填则使用默认搜索空间
         dataset:输入数据集，将会按照0.7, 0.3比例分为训练集和测试集
