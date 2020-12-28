@@ -24,6 +24,7 @@ def grid_search_and_result_ssl(
         k: int = 5):
     """
     交叉验证网格搜索，测试集和训练集得分，混淆矩阵和ROC曲线绘制
+
     Args:
         Xtrain: 训练集特征
         ytrain: 训练集标签
@@ -84,6 +85,7 @@ def grid_search_and_result_ssl(
 def do_tsvm(data: DataSet, log_dir: str = '../log', grid: dict = None):
     """
     Transductive Support Vector Machine
+
     Args:
         data: 输入数据DataSet对象
         grid:超参数搜索空间的网格，不填则使用默认搜索空间

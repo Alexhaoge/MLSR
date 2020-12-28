@@ -18,6 +18,7 @@ def lower_bound(cv_results: dict):
     Calculate the lower bound within 1 standard deviation
     of the best `mean_test_scores`.
     Author: Wenhao Zhang <wenhaoz@ucla.edu>
+
     Args:
         cv_results: dict of numpy(masked) ndarrays
         See attribute cv_results_ of `GridSearchCV`
@@ -39,6 +40,7 @@ def best_low_complexity(cv_results: dict):
     """
     Balance model complexity with cross-validated score.
     Author: Wenhao Zhang <wenhaoz@ucla.edu>
+
     Args:
         cv_results: dict of numpy(masked) ndarrays
         See attribute cv_results_ of `GridSearchCV`.
@@ -72,6 +74,7 @@ def grid_search_and_result(
         fit_params: dict = None):
     """
     交叉验证网格搜索，测试集和训练集得分，混淆矩阵和ROC曲线绘制
+
     Args:
         Xtrain: 训练集特征
         ytrain: 训练集标签
@@ -137,6 +140,7 @@ def grid_search_and_result(
 def do_decision_tree(dataset: DataSet, log_dir: str = '../log', grid: dict = None):
     """
     训练决策树
+
     Args:
         grid:超参数搜索空间的网格，不填则使用默认搜索空间
         dataset:输入数据集，将会按照0.7, 0.3比例分为训练集和测试集
@@ -167,6 +171,7 @@ def do_decision_tree(dataset: DataSet, log_dir: str = '../log', grid: dict = Non
 def do_random_forest(dataset: DataSet, log_dir: str = '../log', grid: dict = None):
     """
     训练随机森林
+
     Args:
         grid:超参数搜索空间的网格，不填则使用默认搜索空间
         dataset:输入数据集，将会按照0.7, 0.3比例分为训练集和测试集
@@ -212,6 +217,7 @@ def do_random_forest(dataset: DataSet, log_dir: str = '../log', grid: dict = Non
 def do_svm(dataset: DataSet, log_dir: str = '../log', grid: dict = None):
     """
     训练支持向量机
+
     Args:
         grid:超参数搜索空间的网格，不填则使用默认搜索空间
         dataset:输入数据集，将会按照0.7, 0.3比例分为训练集和测试集
@@ -255,6 +261,7 @@ def do_svm(dataset: DataSet, log_dir: str = '../log', grid: dict = None):
 def do_logistic(dataset: DataSet, log_dir: str = '../log', grid: dict = None):
     """
     训练逻辑回归
+
     Args:
         grid:超参数搜索空间的网格，不填则使用默认搜索空间
         dataset:输入数据集，将会按照0.7, 0.3比例分为训练集和测试集
@@ -286,6 +293,7 @@ def do_logistic(dataset: DataSet, log_dir: str = '../log', grid: dict = None):
 def do_naive_bayes(dataset: DataSet, log_dir: str = '../log', grid: dict = None):
     """
     训练朴素贝叶斯
+
     Args:
         grid:超参数搜索空间的网格，不填则使用默认搜索空间
         dataset:输入数据集，将会按照0.7, 0.3比例分为训练集和测试集
@@ -310,6 +318,7 @@ def do_naive_bayes(dataset: DataSet, log_dir: str = '../log', grid: dict = None)
 def do_xgb(dataset: DataSet, log_dir: str = '../log', grid: dict = None):
     """
     训练Xgboost
+
     Args:
         grid:超参数搜索空间的网格，不填则使用默认搜索空间
         dataset:输入数据集，将会按照0.7, 0.3比例分为训练集和测试集

@@ -10,6 +10,7 @@ from .data import DataSet
 def plot_confusion_matrix(cm, classes, filename, title='Confusion matrix', cmap=plt.cm.Blues):
     """
     绘制混淆矩阵，如果本地有图形界面或
+
     Args:
         cm: 混淆矩阵，numpy.ndarray
         classes: 类名
@@ -43,6 +44,7 @@ def plot_confusion_matrix(cm, classes, filename, title='Confusion matrix', cmap=
 def plot_roc(model, X, y, filename):
     """
     画roc图，不过sklearn只支持二分类roc，三分类画不了
+
     Args:
         model: 模型
         X: 特征
@@ -63,6 +65,7 @@ def plot_roc(model, X, y, filename):
 def plot_tsne(data: DataSet, filename: str, n_iter: int = 1000):
     """
     tSNE降维绘图
+
     Args:
         data: 数据集
         filename: 图片保存路径
@@ -92,6 +95,7 @@ def plot_tsne(data: DataSet, filename: str, n_iter: int = 1000):
 def plot_tsne_ssl(data: DataSet, filename: str, n_iter: int = 1000):
     """
     半监督数据集的tSNE降维绘图
+
     Args:
         data: 数据集
         filename: 图片保存路径
