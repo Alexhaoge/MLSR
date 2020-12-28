@@ -1,0 +1,14 @@
+{'cv': 5, 'error_score': nan, 'estimator__memory': None, 'estimator__steps': [('scaler', MinMaxScaler()), ('Logistic', LogisticRegression(max_iter=500, n_jobs=-1))], 'estimator__verbose': False, 'estimator__scaler': MinMaxScaler(), 'estimator__Logistic': LogisticRegression(max_iter=500, n_jobs=-1), 'estimator__scaler__clip': False, 'estimator__scaler__copy': True, 'estimator__scaler__feature_range': (0, 1), 'estimator__Logistic__C': 1.0, 'estimator__Logistic__class_weight': None, 'estimator__Logistic__dual': False, 'estimator__Logistic__fit_intercept': True, 'estimator__Logistic__intercept_scaling': 1, 'estimator__Logistic__l1_ratio': None, 'estimator__Logistic__max_iter': 500, 'estimator__Logistic__multi_class': 'auto', 'estimator__Logistic__n_jobs': -1, 'estimator__Logistic__penalty': 'l2', 'estimator__Logistic__random_state': None, 'estimator__Logistic__solver': 'lbfgs', 'estimator__Logistic__tol': 0.0001, 'estimator__Logistic__verbose': 0, 'estimator__Logistic__warm_start': False, 'estimator': Pipeline(steps=[('scaler', MinMaxScaler()),
+                ('Logistic', LogisticRegression(max_iter=500, n_jobs=-1))]), 'n_jobs': -1, 'param_grid': {'Logistic__penalty': ['l1', 'l2', 'elasticnet', 'none'], 'Logistic__C': [0.0001, 0.001, 0.01, 0.1, 1, 2, 5, 10, 100, 1000], 'Logistic__solver': ['lbfgs', 'liblinear', 'newton-cg', 'sag', 'saga'], 'Logistic__fit_intercept': [True, False], 'Logistic__dual': [True, False], 'Logistic__l1_ratio': [True, False], 'Logistic__warm_start': [True, False], 'Logistic__intercept_scaling': [0.01, 0.1, 0.5, 1, 2, 5, 10]}, 'pre_dispatch': '2*n_jobs', 'refit': 'f1', 'return_train_score': False, 'scoring': {'f1': 'f1_macro', 'accuracy': 'accuracy'}, 'verbose': 2}
+Best score on training set by grid search cross validation: 0.7762885406475996
+Accuracy on test set: 0.7044317369549679
+F1-score on test set: 0.7702020396363193
+
+train_cm:
+[[1674 1164    5]
+ [ 716 2265    9]
+ [   0    8  687]]
+test_cm:
+[[718 483   6]
+ [328 955   3]
+ [  0   7 298]]
