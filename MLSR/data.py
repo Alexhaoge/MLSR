@@ -14,6 +14,7 @@ class DataSet:
         三个属性。label中特别困难为0，一般困难为1，不困难为2；strong_label将四个细化的困难级别
         设为0~3，0最困难，且strong_label中不考虑“不困难”（也就是label=2）的情况。
         为和Scikit-learn输入保持一致，无强标签的数据，strong_label=-1。
+
         Args:
             filename: 文件路径
             encode: 文件编码
@@ -36,6 +37,7 @@ class DataSet:
     def merge(self, y):
         """
         将一个DataSet加入当前的DataSet尾部
+
         Args:
             y: 要加入的DataSet
 
@@ -51,6 +53,7 @@ class DataSet:
     def static_merge(x, y):
         """
         将DataSet y拼接到DataSet x后面，返回一个新的数据集
+
         Args:
             x: DataSet
             y: DataSet
@@ -67,6 +70,7 @@ class DataSet:
     def split_by_weak_label(self, reset_index: bool = True):
         """
         将初次分类的得到的结果中，评为特别困难和一般困难的分开挑出来
+
         Returns: (DataSet, DataSet) 两个DataSet对象，第一个是特别困难，第二个是一般困难
 
         """
@@ -90,7 +94,9 @@ class DataSet:
     def reset_index(self):
         """
         将数据及重新标号
+
         Notes: 调用pandas.reset_index时inplace为True
+
         Returns: 重新标号后的DataSet
 
         """
@@ -102,6 +108,7 @@ class DataSet:
     def convert_to_ssl(self):
         """将数据集转为半监督任务用的数据集
         将弱标签作为一个新的特征，并且删去非困难的数据
+
         Returns: DataSet对象
 
         """
@@ -121,7 +128,9 @@ class DataSet:
         我们使用的数据集中的特殊处理
         一共有16个特征，发现第1772个数据在原数据集里列填串了，第8297个数据无标签，删去
         院系、专业、出生年月、校区没有用，删掉
+
         Warnings: 这个函数没什么用了，之后删掉
+
         Args:
             data:待处理的pandas.DataFrame
 
@@ -138,7 +147,9 @@ class DataSet:
     def shuffle_and_pick(data, out_path: str = 'rand_select') -> tuple:
         """
         随机打乱后随机抽取的400个样本，用于人工再标注细化标签
+
         Warnings: 这个函数写得不太好，之后删掉
+
         Args:
             data:待处理数据，pandas.DataFrame
             out_path:保存文件路径
@@ -159,6 +170,7 @@ class DataSet:
     def do_nation_policy(data: pd.DataFrame) -> pd.DataFrame:
         """
         处理“享受国家政策资助情况”一列
+
         Args:
             data: 待处理的pandas.DataFrame，建议传入所有特征
 
@@ -181,6 +193,7 @@ class DataSet:
     def do_income(data: pd.DataFrame, fill_to_no_income: bool = True) -> pd.DataFrame:
         """
         家庭主要经济来源
+
         Args:
             data:
             fill_to_no_income:
@@ -547,6 +560,7 @@ class DataSet:
         这里jieba无法将“父母”、“父/母”、“父(母)”、“父亲（母亲）”分开，所以需要加一个判断条件，会用在后面无业、患病、去世中
         一个人之后可能跟着多个illness，应全部与其绑定。若人是祖父母，则统计其是否患病；父母则看是否有重病，且应将父母辨别开；兄弟姐妹只统计重疾。
         有可能出现人 -> illness ->dead。所有人都有可能dead，dead需要与之前最近的一个人或连续的多个人绑定，但只统计父或母去世。
+
         Args:
             s:待处理的pandas.Series
 
@@ -847,6 +861,7 @@ class DataSet:
     def do_scholarship(s: pd.Series) -> pd.DataFrame:
         """
         识别在校期间获得助学金情况
+
         Args:
             s:待处理的特征，pandas.Series
 
@@ -891,6 +906,7 @@ class DataSet:
     def do_resident_type(s: pd.Series) -> pd.Series:
         """
         识别户口类型，缺失值视为城镇户口
+
         Args:
             s:待处理的特征，pandas.Series
 
@@ -904,6 +920,7 @@ class DataSet:
     def do_household(s: pd.Series) -> pd.Series:
         """
         识别家庭人口数量，缺失则视为三口之家
+
         Args:
             s:待处理的特征，pandas.Series
 
@@ -928,6 +945,7 @@ class DataSet:
     def do_loan(s: pd.Series):
         """
         识别是否贷款，缺失值视为无贷款
+
         Notes: 只识别生源地和校园地助学贷款，其他贷款不在认定考虑范围内
         Args:
             s:待处理的特征，pandas.Series
@@ -956,6 +974,7 @@ class DataSet:
     def do_ethnic_group(s: pd.Series) -> pd.Series:
         """
         识别是否为少数民族，缺失值视为汉族
+
         Args:
             s: 待处理的特征，pandas.Series
 

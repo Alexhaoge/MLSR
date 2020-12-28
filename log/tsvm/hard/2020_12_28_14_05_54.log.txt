@@ -1,0 +1,12 @@
+{'cv': 5, 'error_score': nan, 'estimator__memory': None, 'estimator__steps': [('scaler', MinMaxScaler()), ('tsvm', TSVM())], 'estimator__verbose': False, 'estimator__scaler': MinMaxScaler(), 'estimator__tsvm': TSVM(), 'estimator__scaler__clip': False, 'estimator__scaler__copy': True, 'estimator__scaler__feature_range': (0, 1), 'estimator__tsvm__Cl': 1, 'estimator__tsvm__Cu': 0.001, 'estimator__tsvm__kernel': 'linear', 'estimator__tsvm__clf': None, 'estimator__tsvm__n_iter': 10, 'estimator': Pipeline(steps=[('scaler', MinMaxScaler()), ('tsvm', TSVM())]), 'n_jobs': -1, 'param_grid': {'tsvm__kernel': ['rbf'], 'tsvm__n_iter': [50], 'tsvm__Cu': [0.001]}, 'pre_dispatch': '2*n_jobs', 'refit': 'f1', 'return_train_score': False, 'scoring': {'f1': 'f1_macro', 'accuracy': 'accuracy'}, 'verbose': 2}
+Best score on training set by grid search cross validation: 0.02108450072745424
+Accuracy on test set: 0.6239316239316239
+F1-score on test set: 0.6216931216931216
+
+train_cm:
+[[   0 1563 2293]
+ [   0   29    8]
+ [   0    7   33]]
+test_cm:
+[[32 24]
+ [20 41]]

@@ -73,7 +73,7 @@ def grid_search_and_result_ssl(
         file.write('\ntrain_cm:\n')
         file.write(cm.__str__())
         cm = confusion_matrix(ytest, test_prediction)
-        plot_confusion_matrix(cm, ['无标签', '0', '1'], file_prefix + '_test_cm.png')
+        plot_confusion_matrix(cm, ['0', '1'], file_prefix + '_test_cm.png')
         file.write('\ntest_cm:\n')
         file.write(cm.__str__())
     #         plot_roc(best_model, Xtest, ytest, file_prefix + '_roc.png')
