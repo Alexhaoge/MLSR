@@ -83,7 +83,7 @@ def grid_search_and_result_ssl(
 
 def do_tsvm(data: DataSet, log_dir: str = '../log', grid: dict = None):
     """
-    TSVM
+    Transductive Support Vector Machine
     Args:
         data: 输入数据DataSet对象
         grid:超参数搜索空间的网格，不填则使用默认搜索空间

@@ -117,9 +117,8 @@ class TSVM(BaseEstimator, ClassifierMixin):
                 np.array, shape:[n, ], n: numbers of samples
             sample_weight:
 
-        Returns
-        -------
-        Accuracy of TSVM
+        Returns:
+            Accuracy of TSVM
                 float
         """
         return self.clf.score(X, (Y * 2 - 1), sample_weight=sample_weight)
@@ -132,20 +131,19 @@ class TSVM(BaseEstimator, ClassifierMixin):
             X: Input data
                 np.array, shape:[n, m], n: numbers of samples, m: numbers of features
 
-        Returns
-        -------
-        labels of X
+        Returns:
+            labels of X
                 np.array, shape:[n, ], n: numbers of samples
         """
         return (self.clf.predict(X) + 1) / 2
 
-    def save(self, path):
+    def save(self, path: str):
         """
         Save TSVM to model_path
 
         Args:
-            model_path: model path of TSVM
-                        model should be svm in sklearn
+            path: model path of TSVM
+                Notes: model should be svm in sklearn
         """
         dump(self.clf, path)
 
