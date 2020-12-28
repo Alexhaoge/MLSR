@@ -96,8 +96,8 @@ def do_tsvm(data: DataSet, log_dir: str = '../log', grid: dict = None):
     if grid is None:
         grid = {
             'tsvm__kernel': ['linear', 'poly', 'rbf', 'sigmoid'],
-            'n_iter': [10, 50],
-            'Cu': [0.0001, 0.001, 0.01]
+            'tsvm__n_iter': [10, 50],
+            'tsvm__Cu': [0.0001, 0.001, 0.01]
         }
     pipe = Pipeline([
         ('scaler', MinMaxScaler()),
