@@ -51,7 +51,11 @@ def plot_roc(model, X, y, filename):
     dis = plot_roc_curve(model, X, y, ax=ax)
     dis.plot(ax=ax, alpha=0.8)
     plt.savefig(filename)
-    plt.show()
+    try:
+        plt.show()
+    except Exception as e:
+        print(e.args)
+    
 
 
 def plot_tsne(data: DataSet, filename: str, n_iter: int = 1000):
@@ -67,7 +71,10 @@ def plot_tsne(data: DataSet, filename: str, n_iter: int = 1000):
 
     plt.legend(loc="best", markerscale=2., numpoints=2, scatterpoints=2, fontsize=12)
     plt.savefig(filename)
-    plt.show()
+    try:
+        plt.show()
+    except Exception as e:
+        print(e.args)
 
 
 def plot_tsne_ssl(data: DataSet, filename: str, n_iter: int = 1000):
@@ -89,4 +96,7 @@ def plot_tsne_ssl(data: DataSet, filename: str, n_iter: int = 1000):
         )
     plt.legend(loc="best")
     plt.savefig(filename)
-    plt.show()
+    try:
+        plt.show()
+    except Exception as e:
+        print(e.args)
