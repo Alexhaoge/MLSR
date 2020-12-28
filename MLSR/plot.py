@@ -34,7 +34,10 @@ def plot_confusion_matrix(cm, classes, filename, title='Confusion matrix', cmap=
     plt.ylabel('True label')
     plt.xlabel('Predicted label')
     plt.savefig(filename)
-    plt.show()
+    try:
+        plt.show()
+    except Exception as e:
+        print(e.args)
 
 
 def plot_roc(model, X, y, filename):
