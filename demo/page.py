@@ -252,7 +252,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
         self.evalButton.clicked.connect(MainWindow.model_predict)
-        self.actionOpen.triggered.connect(MainWindow.show)
+        self.actionOpen.triggered.connect(MainWindow.load_from_status_bar)
         self.actionExit.triggered.connect(MainWindow.close)
         self.actionAbout.triggered.connect(MainWindow.open_github)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -340,7 +340,7 @@ class Ui_MainWindow(object):
         self.ethnic.setToolTip(_translate("MainWindow", "民族"))
         self.evalButton.setText(_translate("MainWindow", "评估"))
         self.menuExit.setTitle(_translate("MainWindow", "开始"))
-        self.menuAbout.setTitle(_translate("MainWindow", "About"))
+        self.menuAbout.setTitle(_translate("MainWindow", "关于"))
         self.actionOpen.setText(_translate("MainWindow", "导入模型"))
         self.actionSetting.setText(_translate("MainWindow", "设置"))
         self.actionExit.setText(_translate("MainWindow", "退出"))
