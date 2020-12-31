@@ -6,18 +6,34 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>556</width>
-    <height>691</height>
+    <width>481</width>
+    <height>698</height>
    </rect>
   </property>
   <property name="sizePolicy">
-   <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
+  <property name="minimumSize">
+   <size>
+    <width>481</width>
+    <height>698</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>481</width>
+    <height>698</height>
+   </size>
+  </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>MLSR - 困难生评估程序 - v0.1.0</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>favicon.png</normaloff>favicon.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
    <property name="sizePolicy">
@@ -50,7 +66,7 @@
       </widget>
      </item>
      <item row="0" column="1">
-      <widget class="QGroupBox" name="gridGroupBox">
+      <widget class="QGroupBox" name="PolicyGroupBox">
        <property name="toolTip">
         <string>选择所享受的所有政策</string>
        </property>
@@ -59,35 +75,35 @@
        </property>
        <layout class="QGridLayout" name="gridLayout">
         <item row="0" column="0">
-         <widget class="QCheckBox" name="checkBox">
+         <widget class="QCheckBox" name="isCardProverty">
           <property name="text">
            <string>建档立卡贫困户</string>
           </property>
          </widget>
         </item>
         <item row="0" column="1">
-         <widget class="QCheckBox" name="checkBox_2">
+         <widget class="QCheckBox" name="isLowest">
           <property name="text">
            <string>城乡低保户</string>
           </property>
          </widget>
         </item>
         <item row="0" column="2">
-         <widget class="QCheckBox" name="checkBox_3">
+         <widget class="QCheckBox" name="isFiveGuarantee">
           <property name="text">
            <string>五保户</string>
           </property>
          </widget>
         </item>
         <item row="1" column="0">
-         <widget class="QCheckBox" name="checkBox_5">
+         <widget class="QCheckBox" name="isOrphan">
           <property name="text">
            <string>孤残学生</string>
           </property>
          </widget>
         </item>
         <item row="1" column="1">
-         <widget class="QCheckBox" name="checkBox_4">
+         <widget class="QCheckBox" name="isMartyrsFamily">
           <property name="text">
            <string>军烈属或优抚子女</string>
           </property>
@@ -104,7 +120,7 @@
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="QGroupBox" name="gridGroupBox">
+      <widget class="QGroupBox" name="incomeGroupBox">
        <property name="toolTip">
         <string>可多选，选最主要两个</string>
        </property>
@@ -113,35 +129,35 @@
        </property>
        <layout class="QGridLayout" name="gridLayout_2">
         <item row="0" column="2">
-         <widget class="QCheckBox" name="checkBox_9">
+         <widget class="QCheckBox" name="isWork">
           <property name="text">
            <string>打工</string>
           </property>
          </widget>
         </item>
         <item row="0" column="1">
-         <widget class="QCheckBox" name="checkBox_8">
+         <widget class="QCheckBox" name="isFarm">
           <property name="text">
            <string>务农</string>
           </property>
          </widget>
         </item>
         <item row="0" column="0">
-         <widget class="QCheckBox" name="checkBox_6">
+         <widget class="QCheckBox" name="isBussiness">
           <property name="text">
            <string>经商</string>
           </property>
          </widget>
         </item>
         <item row="0" column="3">
-         <widget class="QCheckBox" name="checkBox_7">
+         <widget class="QCheckBox" name="isRetire">
           <property name="text">
            <string>退休</string>
           </property>
          </widget>
         </item>
         <item row="0" column="4">
-         <widget class="QCheckBox" name="checkBox_10">
+         <widget class="QCheckBox" name="noIncome">
           <property name="text">
            <string>无固定收入</string>
           </property>
@@ -158,7 +174,17 @@
       </widget>
      </item>
      <item row="2" column="1">
-      <widget class="QSpinBox" name="income"/>
+      <widget class="QDoubleSpinBox" name="income">
+       <property name="maximumSize">
+        <size>
+         <width>128</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="maximum">
+        <double>100000000.000000000000000</double>
+       </property>
+      </widget>
      </item>
      <item row="3" column="0">
       <widget class="QLabel" name="label_4">
@@ -168,24 +194,24 @@
       </widget>
      </item>
      <item row="3" column="1">
-      <widget class="QGroupBox" name="horizontalGroupBox">
+      <widget class="QGroupBox" name="isParentUnemployed">
        <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
-         <widget class="QRadioButton" name="radioButton_3">
+         <widget class="QRadioButton" name="noneUnemployed">
           <property name="text">
            <string>否</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QRadioButton" name="radioButton_2">
+         <widget class="QRadioButton" name="eitherUnemployed">
           <property name="text">
            <string>父母一方下岗</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QRadioButton" name="radioButton">
+         <widget class="QRadioButton" name="bothUnemployed">
           <property name="text">
            <string>父母均下岗</string>
           </property>
@@ -202,7 +228,17 @@
       </widget>
      </item>
      <item row="4" column="1">
-      <widget class="QSpinBox" name="household"/>
+      <widget class="QSpinBox" name="household">
+       <property name="maximumSize">
+        <size>
+         <width>64</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="maximum">
+        <number>20</number>
+       </property>
+      </widget>
      </item>
      <item row="5" column="0">
       <widget class="QLabel" name="label_7">
@@ -220,13 +256,6 @@
      <item row="5" column="1">
       <widget class="QGroupBox" name="horizontalGroupBox_3">
        <layout class="QGridLayout" name="gridLayout_4">
-        <item row="0" column="1">
-         <widget class="QLabel" name="label_8">
-          <property name="text">
-           <string>人在读本科专科及以上学历</string>
-          </property>
-         </widget>
-        </item>
         <item row="0" column="3">
          <widget class="QLabel" name="label_9">
           <property name="text">
@@ -234,8 +263,21 @@
           </property>
          </widget>
         </item>
+        <item row="0" column="2">
+         <widget class="QSpinBox" name="numHigh"/>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLabel" name="label_8">
+          <property name="text">
+           <string>人在读本科专科及以上学历</string>
+          </property>
+         </widget>
+        </item>
         <item row="1" column="0">
-         <widget class="QSpinBox" name="spinBox_4"/>
+         <widget class="QSpinBox" name="numPrim"/>
+        </item>
+        <item row="0" column="0">
+         <widget class="QSpinBox" name="numUniv"/>
         </item>
         <item row="1" column="1">
          <widget class="QLabel" name="label_10">
@@ -243,12 +285,6 @@
            <string>人在读义务教育阶段</string>
           </property>
          </widget>
-        </item>
-        <item row="0" column="0">
-         <widget class="QSpinBox" name="spinBox_2"/>
-        </item>
-        <item row="0" column="2">
-         <widget class="QSpinBox" name="spinBox_3"/>
         </item>
        </layout>
       </widget>
@@ -261,66 +297,66 @@
       </widget>
      </item>
      <item row="6" column="1">
-      <widget class="QGroupBox" name="gridGroupBox_2">
+      <widget class="QGroupBox" name="accidentGroupBox">
        <layout class="QGridLayout" name="gridLayout_3">
         <item row="1" column="1">
-         <widget class="QCheckBox" name="checkBox_15">
+         <widget class="QCheckBox" name="bothParentNormalDisease">
           <property name="text">
            <string>父母均患普通疾病</string>
           </property>
          </widget>
         </item>
         <item row="1" column="0">
-         <widget class="QCheckBox" name="checkBox_11">
+         <widget class="QCheckBox" name="oneParentNormalDisease">
           <property name="text">
            <string>父母一方患普通疾病</string>
           </property>
          </widget>
         </item>
         <item row="0" column="1">
-         <widget class="QCheckBox" name="checkBox_14">
+         <widget class="QCheckBox" name="parentDivorce">
           <property name="text">
            <string>父母离异</string>
           </property>
          </widget>
         </item>
         <item row="0" column="0">
-         <widget class="QCheckBox" name="checkBox_13">
+         <widget class="QCheckBox" name="grandParentDisease">
           <property name="text">
            <string>祖父母患病</string>
           </property>
          </widget>
         </item>
         <item row="3" column="0">
-         <widget class="QCheckBox" name="checkBox_17">
+         <widget class="QCheckBox" name="siblingDisease">
           <property name="text">
            <string>兄弟姐妹患疾病</string>
           </property>
          </widget>
         </item>
         <item row="2" column="0">
-         <widget class="QCheckBox" name="checkBox_12">
+         <widget class="QCheckBox" name="oneParentSeriousDisease">
           <property name="text">
            <string>父母一方患重疾</string>
           </property>
          </widget>
         </item>
         <item row="3" column="1">
-         <widget class="QCheckBox" name="checkBox_18">
+         <widget class="QCheckBox" name="parentPassAway">
           <property name="text">
            <string>父亲或母亲去世</string>
           </property>
          </widget>
         </item>
         <item row="2" column="1">
-         <widget class="QCheckBox" name="checkBox_16">
+         <widget class="QCheckBox" name="bothParentSeriousDisease">
           <property name="text">
            <string>父母均患重疾</string>
           </property>
          </widget>
         </item>
         <item row="4" column="0">
-         <widget class="QCheckBox" name="checkBox_19">
+         <widget class="QCheckBox" name="naturalAccident">
           <property name="text">
            <string>突发重大自然灾害</string>
           </property>
@@ -343,17 +379,17 @@
       </widget>
      </item>
      <item row="7" column="1">
-      <widget class="QGroupBox" name="horizontalGroupBox_2">
+      <widget class="QGroupBox" name="isLoanGroup">
        <layout class="QHBoxLayout" name="horizontalLayout_2">
         <item>
-         <widget class="QRadioButton" name="radioButton_5">
+         <widget class="QRadioButton" name="yesLoan">
           <property name="text">
            <string>是</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QRadioButton" name="radioButton_4">
+         <widget class="QRadioButton" name="noLoan">
           <property name="text">
            <string>否</string>
           </property>
@@ -370,7 +406,7 @@
       </widget>
      </item>
      <item row="8" column="1">
-      <widget class="QTextEdit" name="textEdit">
+      <widget class="QTextEdit" name="scholarshipText">
        <property name="maximumSize">
         <size>
          <width>324</width>
@@ -387,7 +423,7 @@
       </widget>
      </item>
      <item row="9" column="1">
-      <widget class="QLineEdit" name="lineEdit">
+      <widget class="QLineEdit" name="ethnic">
        <property name="maximumSize">
         <size>
          <width>128</width>
@@ -395,15 +431,22 @@
         </size>
        </property>
        <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;民族&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>民族</string>
        </property>
        <property name="text">
         <string/>
        </property>
       </widget>
      </item>
+     <item row="10" column="1">
+      <widget class="Line" name="line">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
      <item row="11" column="0">
-      <widget class="QPushButton" name="pushButton">
+      <widget class="QPushButton" name="evalButton">
        <property name="text">
         <string>评估</string>
        </property>
@@ -419,33 +462,7 @@
        </property>
       </widget>
      </item>
-     <item row="10" column="1">
-      <widget class="Line" name="line">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-      </widget>
-     </item>
     </layout>
-   </widget>
-   <widget class="QScrollBar" name="verticalScrollBar">
-    <property name="geometry">
-     <rect>
-      <x>500</x>
-      <y>50</y>
-      <width>20</width>
-      <height>511</height>
-     </rect>
-    </property>
-    <property name="sizePolicy">
-     <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
-      <horstretch>0</horstretch>
-      <verstretch>0</verstretch>
-     </sizepolicy>
-    </property>
-    <property name="orientation">
-     <enum>Qt::Vertical</enum>
-    </property>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -453,13 +470,13 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>556</width>
+     <width>481</width>
      <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuExit">
     <property name="title">
-     <string>Begin</string>
+     <string>开始</string>
     </property>
     <addaction name="actionOpen"/>
     <addaction name="actionSetting"/>
@@ -479,30 +496,130 @@
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionOpen">
    <property name="text">
-    <string>Open</string>
+    <string>导入模型</string>
    </property>
   </action>
   <action name="actionSetting">
    <property name="text">
-    <string>Settings</string>
+    <string>设置</string>
    </property>
   </action>
   <action name="actionExit">
    <property name="text">
-    <string>Exit</string>
+    <string>退出</string>
    </property>
   </action>
   <action name="actionHelp">
    <property name="text">
-    <string>Help</string>
+    <string>帮助</string>
    </property>
   </action>
   <action name="actionAbout">
    <property name="text">
-    <string>About MLSR</string>
+    <string>关于MLSR</string>
    </property>
   </action>
  </widget>
+ <tabstops>
+  <tabstop>isCardProverty</tabstop>
+  <tabstop>isLowest</tabstop>
+  <tabstop>isFiveGuarantee</tabstop>
+  <tabstop>isOrphan</tabstop>
+  <tabstop>isMartyrsFamily</tabstop>
+  <tabstop>isBussiness</tabstop>
+  <tabstop>isFarm</tabstop>
+  <tabstop>isWork</tabstop>
+  <tabstop>isRetire</tabstop>
+  <tabstop>noIncome</tabstop>
+  <tabstop>income</tabstop>
+  <tabstop>noneUnemployed</tabstop>
+  <tabstop>eitherUnemployed</tabstop>
+  <tabstop>bothUnemployed</tabstop>
+  <tabstop>household</tabstop>
+  <tabstop>numUniv</tabstop>
+  <tabstop>numHigh</tabstop>
+  <tabstop>numPrim</tabstop>
+  <tabstop>grandParentDisease</tabstop>
+  <tabstop>parentDivorce</tabstop>
+  <tabstop>oneParentNormalDisease</tabstop>
+  <tabstop>bothParentNormalDisease</tabstop>
+  <tabstop>oneParentSeriousDisease</tabstop>
+  <tabstop>bothParentSeriousDisease</tabstop>
+  <tabstop>siblingDisease</tabstop>
+  <tabstop>parentPassAway</tabstop>
+  <tabstop>naturalAccident</tabstop>
+  <tabstop>yesLoan</tabstop>
+  <tabstop>noLoan</tabstop>
+  <tabstop>scholarshipText</tabstop>
+  <tabstop>ethnic</tabstop>
+  <tabstop>evalButton</tabstop>
+  <tabstop>resultArea</tabstop>
+ </tabstops>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>evalButton</sender>
+   <signal>clicked()</signal>
+   <receiver>resultArea</receiver>
+   <slot>reload()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>56</x>
+     <y>614</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>306</x>
+     <y>634</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionOpen</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>show()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>240</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionExit</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>240</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionAbout</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>show()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>240</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>
