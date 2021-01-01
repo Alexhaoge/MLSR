@@ -20,3 +20,9 @@ Type `python main.py --help` for command of other models.
 2. For plot, run `python plot_main.py`. (You may need to modify this code to draw the plot you want.)
 ## API Documentation
 [click here](https://www.alexhaoge.xyz/mlsr/index.html)
+## Building the Demo
+We write a GUI application as a demo of our model, which is in the `demo` folder. If you want to build it, first ensure `PyQt5` and `pyinstaller` is installed(version specification can be found in `/config/requirement.txt`).
+Then type this command in the `demo` folder:
+```shell script
+pyinstaller -F -w -i favicon.ico MLSR_Demo.py
+```
