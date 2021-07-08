@@ -1,4 +1,5 @@
 import sys
+from traceback import print_exc
 from pandas import Series, DataFrame
 from PyQt5.QtCore import QDir
 from PyQt5.QtWidgets import QApplication, QMainWindow, QDialog, QFileDialog
@@ -6,6 +7,10 @@ from demo.page import *
 from demo.pop import *
 from MLSR.data import DataSet
 from joblib import load
+import sklearn
+from sklearn.model_selection import GridSearchCV, train_test_split
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.pipeline import Pipeline
 
 
 class childWindow(QDialog):
@@ -30,6 +35,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 self.model_path = self.open_model()
                 self.model = load(self.model_path)
             except Exception as e:
+                print_exc(e)
                 self.model = None
                 return
         s = Series(dtype=object)
@@ -76,7 +82,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             self.resultArea.setText(ans_type[ans])
         except Exception as e:
             self.resultArea.setText('输入有误或模型导入错误\n请检查输入或重新导入模型')
-            print(e.__str__())
+            print_exc(e)
 
     def open_model(self):
         dig = QFileDialog()
@@ -92,6 +98,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             self.model_path = self.open_model()
             self.model = load(self.model_path)
         except Exception as e:
+            print_exc(e)
             self.model = None
 
     def open_github(self):
