@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>MLSR v0.1.0-alpha Demo</title>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+	<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+</head>
+
+<body onload="getTime()">
+	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+		<div class="container">
+			<a class="navbar-brand" href="#">
+				<img src="{{ url_for('static', filename='favicon.ico') }}" width="30" height="30"
+					class="d-inline-block align-top" alt="">
+				MLSR
+			</a>
+			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+				aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="navbarNav">
+				<ul class="navbar-nav">
+					<li class="nav-item">
+						<a class="nav-link" href="#use">使用</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="https://www.alexhaoge.xyz/mlsr/index.html">文档</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="#about">关于</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+
+	<div class="jumbotron jumbotron-fluid well">
+		<div class="container">
+			<h1>欢迎使用MLSR Demo</h1>
+			<p>数据驱动的经济困难生认定辅助决策模型</p>
+			<p>
+				<strong>特别声明</strong>：本模型目前<strong>只用于研究</strong>，未实际使用，数据驱动的模型评估策略可能因技术不完善，会体现出一些偏见甚至歧视，模型输出结果不能作为最终评定，必须结合专家意见！
+			</p>
+			<p><a class="btn btn-primary btn-large"
+					href="https://github.com/Alexhaoge/MLSR/blob/main/paper%26slides/%E5%9F%BA%E4%BA%8E%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E7%9A%84%E7%BB%8F%E6%B5%8E%E5%9B%B0%E9%9A%BE%E7%94%9F%E7%B2%BE%E5%87%86%E8%B5%84%E5%8A%A9%E7%A0%94%E7%A9%B6-%E5%A4%A7%E4%BD%9C%E4%B8%9A%E8%AE%BA%E6%96%87.pdf">了解更多</a>
+			</p>
+		</div>
+	</div>
+
+	<div class="container">
+		<div class="row">
+			<h2 id="use">使用</h2>
+		</div>
+		<br />
+		<form action="" method="post" id="sform">
+			<div class="row justify-content-between">
+				<div class="col-8 shadow p-3 mb-5 bg-white rounded">
+					<h4>学生信息</h4>
+					<div class="form-group">
+						<h5>享受国家政策资助情况</h5>
+						<div class="form-check form-check-inline">
+							<input class="form-check-input" type="checkbox" name="isCardProverty" value="1" id="isCardProverty">
+							<label class="form-check-label" for="isCardProverty">
+								建档立卡贫困户
+							</label>
+							<input type="hidden" name="isCardProverty" value="0">
+						</div>
+						<div class="form-check form-check-inline">
+							<input class="form-check-input" type="checkbox" name="isLowest" value="1" id="isLowest">
+							<label class="form-check-label" for="isLowest">
+								城乡低保户
+							</label>
+							<input type="hidden" name="isLowest" value="0">
+						</div>
+						<div class="form-check form-check-inline">
+							<input class="form-check-input" type="checkbox" name="isFiveGuarantee" value="1" id="isFiveGuarantee">
+							<label class="form-check-label" for="isFiveGuarantee">
+								五保户
+							</label>
+							<input type="hidden" name="isFiveGuarantee" value="0">
+						</div>
+						<div class="form-check form-check-inline">
+							<input class="form-check-input" type="checkbox" name="isOrphan" value="1" id="isOrphan">
+							<label class="form-check-label" for="isOrphan">
+								孤残学生
+							</label>
+							<input type="hidden" name="isOrphan" value="0">
+						</div>
+						<div class="form-check form-check-inline">
+							<input class="form-check-input" type="checkbox" name="isMartyrsFamily" value="1" id="isMartyrsFamily">
+							<label class="form-check-label" for="isMartyrsFamily">
+								军烈属或优抚子女
+							</label>
+							<input type="hidden" name="isMartyrsFamily" value="0">
+						</div>
+					</div>
+
+					<div class="form-group">
+						<h5>家庭情况</h5>
+						父母是否下岗：
+						<div class="form-check form-check-inline">
+							<input class="form-check-input" type="radio" required name="isParentsEmployed" id="bothEmployed"
+								value="0">
+							<label class="form-check-label" for="bothEmployed">否</label>
+						</div>
+						<div class="form-check form-check-inline">
+							<input class="form-check-input" type="radio" name="isParentsEmployed" id="eitherUnemployed" value="1">
+							<label class="form-check-label" for="eitherUnemployed">父母一方下岗</label>
+						</div>
+						<div class="form-check form-check-inline">
+							<input class="form-check-input" type="radio" name="isParentsEmployed" id="bothUnemployed" value="2">
+							<label class="form-check-label" for="bothUnemployed">父母均下岗</label>
+						</div>
+						<br />家庭主要经济来源：
+						<div class="form-check form-check-inline">
+							<input class="form-check-input" type="checkbox" name="isWork" id="isWork" value="1">
+							<label class="form-check-label" for="isWork">
+								打工
+							</label>
+							<input type="hidden" name="isWork" value="0">
+						</div>
+						<div class="form-check form-check-inline">
+							<input class="form-check-input" type="checkbox" name="isFarm" id="isFarm" value="1">
+							<label class="form-check-label" for="isFarm">
+								务农
+							</label>
+							<input type="hidden" name="isFarm" value="0">
+						</div>
+						<div class="form-check form-check-inline">
+							<input class="form-check-input" type="checkbox" name="isBussiness" id="isBussiness" value="1">
+							<label class="form-check-label" for="isBussiness">
+								经商
+							</label>
+							<input type="hidden" name="isBussiness" value="0">
+						</div>
+						<div class="form-check form-check-inline">
+							<input class="form-check-input" type="checkbox" name="isRetire" id="isRetire" value="1">
+							<label class="form-check-label" for="isRetire">
+								退休
+							</label>
+							<input type="hidden" name="isRetire" value="0">
+						</div>
+						<div class="form-check form-check-inline">
+							<input class="form-check-input" type="checkbox" name="noIncome" id="noIncome" value="1">
+							<label class="form-check-label" for="noIncome">
+								无收入
+							</label>
+							<input type="hidden" name="noIncome" value="0">
+						</div>
+						<br />家庭每年总收入：
+						<input class="form-input" type="number" step="0.01" min="0" name="income" id="income" required>元
+						<br />家庭人口：
+						<input class="form-input" type="number" min="1" max="20" name="household" id="household" required>人
+						<br />家庭成员在受教育情况（不包括学生本人，且必须在读）：<br />&emsp;&emsp;
+						<input class="form-input" type="number" min="0" max="20" name="numUniv" id="numUniv" required>
+						人在读专科本科及以上教育；<br />&emsp;&emsp;
+						<input class="form-input" type="number" min="0" max="20" name="numHigh" id="numHigh" required>
+						人在读高中<br />&emsp;&emsp;
+						<input class="form-input" type="number" min="0" max="20" name="numPrim" id="numPrim" required>
+						人在读义务教育阶段
+						<br />
+					</div>
+
+					<div class="form-group">
+						<h5>家庭突发事件及困难情况</h5>
+						<div class="form-check form-check-inline">
+							<input class="form-check-input" type="checkbox" name="grandParentDisease" value="1"
+								id="grandParentDisease">
+							<label class="form-check-label" for="grandParentDisease">
+								祖父母患病
+							</label>
+							<input type="hidden" name="grandParentDisease" value="0">
+						</div>
+						<div class="form-check form-check-inline">
+							<input class="form-check-input" type="checkbox" name="parentDivorce" value="1" id="parentDivorce">
+							<label class="form-check-label" for="parentDivorce">
+								父母离异
+							</label>
+							<input type="hidden" name="parentDivorce" value="0">
+						</div>
+						<div class="form-check form-check-inline">
+							<input class="form-check-input" type="checkbox" name="oneParentNormalDisease" value="1"
+								id="oneParentNormalDisease">
+							<label class="form-check-label" for="oneParentNormalDisease">
+								父母一方患普通疾病
+							</label>
+							<input type="hidden" name="oneParentNormalDisease" value="0">
+						</div>
+						<div class="form-check form-check-inline">
+							<input class="form-check-input" type="checkbox" name="bothParentNormalDisease" value="1"
+								id="bothParentNormalDisease">
+							<label class="form-check-label" for="bothParentNormalDisease">
+								父母均患普通疾病
+							</label>
+							<input type="hidden" name="bothParentNormalDisease" value="0">
+						</div>
+						<div class="form-check form-check-inline">
+							<input class="form-check-input" type="checkbox" name="oneParentSeriousDisease" value="1"
+								id="oneParentSeriousDisease">
+							<label class="form-check-label" for="oneParentSeriousDisease">
+								父母一方患重疾
+							</label>
+							<input type="hidden" name="oneParentSeriousDisease" value="0">
+						</div>
+						<div class="form-check form-check-inline">
+							<input class="form-check-input" type="checkbox" name="bothParentSeriousDisease" value="1"
+								id="bothParentSeriousDisease">
+							<label class="form-check-label" for="bothParentSeriousDisease">
+								父母均患重疾
+							</label>
+							<input type="hidden" name="bothParentSeriousDisease" value="0">
+						</div>
+						<div class="form-check form-check-inline">
+							<input class="form-check-input" type="checkbox" name="siblingDisease" value="1" id="siblingDisease">
+							<label class="form-check-label" for="siblingDisease">
+								兄弟姐妹患疾病
+							</label>
+							<input type="hidden" name="siblingDisease" value="0">
+						</div>
+						<div class="form-check form-check-inline">
+							<input class="form-check-input" type="checkbox" name="parentPassAway" value="1" id="parentPassAway">
+							<label class="form-check-label" for="parentPassAway">
+								父亲或母亲去世
+							</label>
+							<input type="hidden" name="parentPassAway" value="0">
+						</div>
+						<div class="form-check form-check-inline">
+							<input class="form-check-input" type="checkbox" name="naturalAccident" value="1" id="naturalAccident">
+							<label class="form-check-label" for="naturalAccident">
+								突发重大自然灾害
+							</label>
+							<input type="hidden" name="naturalAccident" value="0">
+						</div>
+					</div>
+
+					<div class="form-group">
+						<h5>学生情况</h5>
+						入学前户口类型
+						<div class="form-check form-check-inline">
+							<input class="form-check-input" type="radio" required name="isRuralResident" id="isUrban" value="0">
+							<label class="form-check-label" for="isUrban">城镇</label>
+						</div>
+						<div class="form-check form-check-inline">
+							<input class="form-check-input" type="radio" name="isRuralResident" id="isRural" value="1">
+							<label class="form-check-label" for="isRural">农村</label>
+						</div>
+						<br />是否有助学贷
+						<div class="form-check form-check-inline">
+							<input class="form-check-input" type="radio" required name="yesLoan" id="yesLoan" value="1">
+							<label class="form-check-label" for="yesLoan">是</label>
+						</div>
+						<div class="form-check form-check-inline">
+							<input class="form-check-input" type="radio" name="yesLoan" id="noLoan" value="0">
+							<label class="form-check-label" for="noLoan">否</label>
+						</div>
+						<br />民族
+						<select class="form-select-inline" name="ethnic" id="ethnic" required>
+							<option value="1">汉族</option>
+							<option value="2">蒙古族</option>
+							<option value="3">回族</option>
+							<option value="4">藏族</option>
+							<option value="5">维吾尔族</option>
+							<option value="6">苗族</option>
+							<option value="7">彝族</option>
+							<option value="8">壮族</option>
+							<option value="9">布依族</option>
+							<option value="10">朝鲜族</option>
+							<option value="11">满族</option>
+							<option value="12">侗族</option>
+							<option value="13">瑶族</option>
+							<option value="14">白族</option>
+							<option value="15">土家族</option>
+							<option value="16">哈尼族</option>
+							<option value="17">哈萨克族</option>
+							<option value="18">傣族</option>
+							<option value="19">黎族</option>
+							<option value="20">傈僳族</option>
+							<option value="21">佤族</option>
+							<option value="22">畲族</option>
+							<option value="23">高山族</option>
+							<option value="24">拉祜族</option>
+							<option value="25">水族</option>
+							<option value="26">东乡族</option>
+							<option value="27">纳西族</option>
+							<option value="28">景颇族</option>
+							<option value="29">柯尔克孜族</option>
+							<option value="30">土族</option>
+							<option value="31">达斡尔族</option>
+							<option value="32">仫佬族</option>
+							<option value="33">羌族</option>
+							<option value="34">布朗族</option>
+							<option value="35">撒拉族</option>
+							<option value="36">毛南族</option>
+							<option value="37">仡佬族</option>
+							<option value="38">锡伯族</option>
+							<option value="39">阿昌族</option>
+							<option value="40">普米族</option>
+							<option value="41">塔吉克族</option>
+							<option value="42">怒族</option>
+							<option value="43">乌孜别克族</option>
+							<option value="44">俄罗斯族</option>
+							<option value="45">鄂温克族</option>
+							<option value="46">德昂族</option>
+							<option value="47">保安族</option>
+							<option value="48">裕固族</option>
+							<option value="49">京族</option>
+							<option value="50">塔塔尔族</option>
+							<option value="51">独龙族</option>
+							<option value="52">鄂伦春族</option>
+							<option value="53">赫哲族</option>
+							<option value="54">门巴族</option>
+							<option value="55">珞巴族</option>
+							<option value="56">基诺族</option>
+						</select>
+						<br />获得奖学金情况
+						<textarea class="form-control" id="exampleFormControlTextarea1" rows="3" name="scholarship"></textarea>
+					</div>
+				</div>
+				<div class="col-3 shadow p-3 mb-5 bg-white rounded">
+					<h4>模型预测</h4>
+					<div class="form-group form-select">
+						<label class="form-select-label" for="selectModel">选择模型</label>
+						<select class="form-select form-control" required name="selectModel" id="selectModel">
+							{% for cat in model_select %}
+								<optgroup label='{{ cat }}'>
+									{% for model in model_select[cat] %}
+										<option value='{{ model['value'] }}'>
+											{{ model['name'] }}
+										</option>
+									{% endfor %}
+								</optgroup>
+							{% endfor %}
+						</select>
+					</div>
+					<div class="form-group">
+						<button type="reset" class="btn btn-secondary">重置</button>
+						<button type="button" class="btn btn-primary" onclick="mlsr()">评估</button>
+					</div>
+					<div class="form-group">
+						<label class="form-label" for="ans">评估结果</label>
+						<textarea class="form-control" id="ans" rows="8" readonly></textarea>
+					</div>
+					<div class="form-group">
+						<label class="form-label" for="logging">日志</label>
+						<textarea class="form-control" id="logging" rows="8" readonly></textarea>
+					</div>
+				</div>
+			</div>
+		</form>
+
+
+		<div class="row" style="margin-top: 3rem;">
+			<h2 id="about">关于</h2>
+		</div>
+		<div class="row" style="margin-bottom: 5rem;">
+			<p>
+				数据驱动的经济困难生认定辅助决策模型<br />
+				开发者：<a href="https://github.com/Alexhaoge">Alexhaoge</a>&emsp;<a
+					href="https://github.com/jimcui3">jimcui3</a><br />
+				Github：<a href="https://github.com/Alexhaoge/MLSR">https://github.com/Alexhaoge/MLSR</a><br />
+				开源许可协议： <a href="https://github.com/Alexhaoge/MLSR/blob/main/LICENSE">MIT Lisence</a><br />
+				MLSR库API文档：<a
+					href="https://www.alexhaoge.xyz/mlsr/index.html">https://www.alexhaoge.xyz/mlsr/index.html</a><br />
+				项目介绍：<a
+					href="https://github.com/Alexhaoge/MLSR/blob/main/paper%26slides/%E5%9F%BA%E4%BA%8E%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E7%9A%84%E7%BB%8F%E6%B5%8E%E5%9B%B0%E9%9A%BE%E7%94%9F%E7%B2%BE%E5%87%86%E8%B5%84%E5%8A%A9%E7%A0%94%E7%A9%B6-%E5%A4%A7%E4%BD%9C%E4%B8%9A%E8%AE%BA%E6%96%87.pdf">报告书</a>
+				&emsp;<a
+					href="https://github.com/Alexhaoge/MLSR/blob/main/paper%26slides/%E5%9F%BA%E4%BA%8E%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E7%9A%84%E7%BB%8F%E6%B5%8E%E5%9B%B0%E9%9A%BE%E7%94%9F%E7%B2%BE%E5%87%86%E8%B5%84%E5%8A%A9%E7%A0%94%E7%A9%B6.pptx">PPT</a>
+			</p>
+		</div>
+	</div>
+
+	<nav class="navbar fixed-bottom navbar-dark bg-dark text-white">
+		<div class="container">
+			<ul class="navbar-nav nav">
+				<li class="nav-item">
+					MLSR Demo © 2021 alexhaoge.xyz &emsp;
+					All rights reserved.&emsp;&emsp;
+					津ICP备20005170号-1 &emsp;&emsp;
+					<a target="_blank" href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=12010102000594"
+						class="text-white" style="display:inline-block;height:20px;line-height:20px;">
+						<img src="/joomla/templates/mydl/img/beian.png" style="float:left;">津公网安备12010102000594号</a>&emsp;&emsp;
+					<!-- <a href="https://github.com/Alexhaoge/MLSR" class="text-light">Github</a> -->
+				</li>
+			</ul>
+		</div>
+	</nav>
+	<a href="https://github.com/Alexhaoge/MLSR">
+
+		<img style="position: fixed; top: -7px; right: -7px; border: 0;"
+			src="https://github.blog/wp-content/uploads/2008/12/forkme_right_darkblue_121621.png?resize=149%2C149"
+			class="attachment-full size-full" alt="Fork me on GitHub" data-recalc-dims="1">
+	</a>
+	<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
+	<script>
+		function getTime() {
+			document.getElementById('logging').innerHTML = new Date().toLocaleString()
+		}
+		function mlsr() {
+			let form = document.getElementById('sform')
+				if (!form.reportValidity())
+				return
+			$.ajax({
+				type: 'POST',
+				dataType: 'json',
+				url: '',
+				data: $('#sform').serialize(),
+				// data: JSON.stringify(form),
+				success: function (result) {
+					logging = document.getElementById('logging')
+					previous_log = logging.innerHTML
+					if (result['error']) {
+						logging.innerHTML = previous_log + '\n' + result['error']
+						alert('遇到错误：\n' + result['error'])
+					}
+					else {
+						let final_ans = '可能为非困难生'
+						if (result['medium'] > result['not'])
+							final_ans = result['severe'] > result['medium'] ? '非常困难' : '一般困难'
+						else
+							final_ans = result['severe'] > result['not'] ? '非常困难' : final_ans
+						document.getElementById('ans').innerHTML =
+							'置信度\n非困难 ' + result['not']
+							+ '\n一般困难 ' + result['medium']
+							+ '\n非常困难 ' + result['severe']
+							+ '\n最终评定结果： '
+							+ final_ans
+						if (result['message'])
+							logging.innerHTML = previous_log + '\n' + result['message']
+					}
+				},
+				error: function (XMLHttpRequest, textStatus, errorThrown) {
+					console.log(XMLHttpRequest.status, XMLHttpRequest.readyState, textStatus)
+					alert("未知错误！")
+				}
+			})
+		}
+	</script>
+</body>
+
+</html>

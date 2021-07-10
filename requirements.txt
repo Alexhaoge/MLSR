@@ -1,0 +1,9 @@
+scikit-learn==0.24.0
+joblib
+pandas
+scipy
+numpy
+jieba
+matplotlib
+flask
+PyQt
