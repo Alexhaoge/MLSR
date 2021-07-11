@@ -8,14 +8,14 @@
 	<title>MLSR v0.1.0-alpha Demo</title>
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
-	<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+	<link rel="shortcut icon" href="/images/mlsr.ico">
 </head>
 
 <body onload="getTime()">
 	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
 		<div class="container">
 			<a class="navbar-brand" href="#">
-				<img src="{{ url_for('static', filename='favicon.ico') }}" width="30" height="30"
+				<img src="/images/mlsr.ico" width="30" height="30"
 					class="d-inline-block align-top" alt="">
 				MLSR
 			</a>
@@ -46,8 +46,8 @@
 			<p>
 				<strong>特别声明</strong>：本模型目前<strong>只用于研究</strong>，未实际使用，数据驱动的模型评估策略可能因技术不完善，会体现出一些偏见甚至歧视，模型输出结果不能作为最终评定，必须结合专家意见！
 			</p>
-			<p><a class="btn btn-primary btn-large"
-					href="https://github.com/Alexhaoge/MLSR/blob/main/paper%26slides/%E5%9F%BA%E4%BA%8E%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E7%9A%84%E7%BB%8F%E6%B5%8E%E5%9B%B0%E9%9A%BE%E7%94%9F%E7%B2%BE%E5%87%86%E8%B5%84%E5%8A%A9%E7%A0%94%E7%A9%B6-%E5%A4%A7%E4%BD%9C%E4%B8%9A%E8%AE%BA%E6%96%87.pdf">了解更多</a>
+			<p><a class="btn btn-info btn-large"
+	 href="https://github.com/Alexhaoge/MLSR/">了解更多</a><a class="btn btn-primary btn-large" href="#use" style="margin-left:1rem;">开始试用</a>
 			</p>
 		</div>
 	</div>
@@ -392,7 +392,7 @@
 	<a href="https://github.com/Alexhaoge/MLSR">
 
 		<img style="position: fixed; top: -7px; right: -7px; border: 0;"
-			src="https://github.blog/wp-content/uploads/2008/12/forkme_right_darkblue_121621.png?resize=149%2C149"
+			src="/images/forkme_right_darkblue_121621.png?resize=149%2C149"
 			class="attachment-full size-full" alt="Fork me on GitHub" data-recalc-dims="1">
 	</a>
 	<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>

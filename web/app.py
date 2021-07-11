@@ -1,3 +1,5 @@
+import sys
+sys.path.append("..")
 from flask import Flask, request, render_template
 from MLSR.data import DataSet
 from joblib import load
